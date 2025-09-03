@@ -1,0 +1,39 @@
+<InterfaceView version="1.3" asn1file="CanOpen.acn" UiFile="interfaceview.ui.xml" modifierHash="8f9a913">
+<Function id="{f4cdcc35-6503-4ffc-ae04-7cd83f292afd}" name="CANopen" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_min="1" startup_priority="1" instances_max="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{6ca084bc-8ed7-4f7b-8662-622685451ef7}" name="receive_data" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+</Provided_Interface>
+
+<Provided_Interface id="{157ef553-c05d-4cb1-a8a0-1a6565d1883d}" name="init" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+</Provided_Interface>
+
+<Provided_Interface id="{3bb3d78b-175c-44f9-b69e-1850643f229c}" name="change_network_state" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+</Provided_Interface>
+
+<Provided_Interface id="{c86c67d2-87f5-4703-91f8-e3e3fc24b366}" name="issue_network_reset" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+</Provided_Interface>
+
+<Provided_Interface id="{835209e2-6aae-4bd1-bf77-339e5005b2cb}" name="get_data_from_object_dictionary" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+</Provided_Interface>
+
+<Provided_Interface id="{fbe0846f-c402-4684-a9c2-b3d4f667b5b4}" name="set_data_in_object_dictionary" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+</Provided_Interface>
+
+<Required_Interface id="{17373443-1a3f-4af8-ac97-5ef488d5b242}" name="send_data" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false">
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface id="{41b93904-6da4-473f-abfa-6f6b271c79a3}" name="get_current_elapsed_time" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false">
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Layer name="default" is_visible="true"/>
+
+</InterfaceView>
