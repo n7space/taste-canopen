@@ -1,0 +1,59 @@
+# Ignore whole work directory
+work/*
+
+# Ignore qt creator cache directory
+.qtc_clangd
+
+# Ignore qt creator user files
+*.pro.user*
+
+# Ignore aadl files
+*.aadl
+
+.gdb_history
+*.txt
+
+# Except CAN_BUS_MOCK source files
+!work/can_bus_mock
+work/can_bus_mock/*
+!work/can_bus_mock/C
+work/can_bus_mock/C/*
+!work/can_bus_mock/C/src
+work/can_bus_mock/C/src/*
+!work/can_bus_mock/C/src/can_bus_mock.c
+
+# Except CANOPEN_ADAPTER source files
+!work/canopen_adapter
+work/canopen_adapter/*
+!work/canopen_adapter/C
+work/canopen_adapter/C/*
+!work/canopen_adapter/C/src
+work/canopen_adapter/C/src/*
+!work/canopen_adapter/C/src/canopen_adapter.c
+
+# Except CANOPEN_PROCESSOR source files
+!work/canopen_processor
+work/canopen_processor/*
+!work/canopen_processor/C
+work/canopen_processor/C/*
+!work/canopen_processor/C/src
+work/canopen_processor/C/src/*
+!work/canopen_processor/C/src/canopen_processor.c
+
+# Except HELPER source files
+!work/helper
+work/helper/*
+!work/helper/C
+work/helper/C/*
+!work/helper/C/src
+work/helper/C/src/*
+!work/helper/C/src/helper.c
+
+# Except TIME_PROVIDER_MOCK source files
+!work/time_provider_mock
+work/time_provider_mock/*
+!work/time_provider_mock/C
+work/time_provider_mock/C/*
+!work/time_provider_mock/C/src
+work/time_provider_mock/C/src/*
+!work/time_provider_mock/C/src/time_provider_mock.c

@@ -1,0 +1,366 @@
+<InterfaceView version="1.3" asn1file="can_component_linux.acn" UiFile="interfaceview.ui.xml" modifierHash="383508e">
+<Function id="{68b0fbc3-8cd7-4bd7-8934-a3d3b9254cfd}" name="CANopen" is_type="NO" language="SDL" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{0d11a806-872d-41ff-84d2-3e69146573ff}" name="receive_can_frame" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="frame" type="Raw-Can-Frame" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{e82fa32f-eb6f-4a86-b04e-7b3d69aba28d}" name="init" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+</Provided_Interface>
+
+<Provided_Interface id="{37f617c1-3f7b-4cbf-9776-4a0b7d538e24}" name="change_network_state" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+</Provided_Interface>
+
+<Provided_Interface id="{faafd617-de95-414a-b8a2-16933de5c60d}" name="issue_network_reset" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+</Provided_Interface>
+
+<Provided_Interface id="{6ba354e7-adbd-44e7-8f7f-3d6d8f0e1638}" name="get_data_from_object_dictionary" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="object" type="CANopen-Object-Index" encoding="NATIVE"/>
+    <Input_Parameter name="subobject" type="CANopen-Subobject-Index" encoding="NATIVE"/>
+    <Output_Parameter name="value" type="CANopen-Value" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{7f1e6e15-ebd2-4458-a92e-d035c90f7c56}" name="set_data_in_object_dictionary" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="object" type="CANopen-Object-Index" encoding="NATIVE"/>
+    <Input_Parameter name="subobject" type="CANopen-Subobject-Index" encoding="NATIVE"/>
+    <Input_Parameter name="value" type="CANopen-Value" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{46d7cbef-66cc-4379-8adc-a4b751af4c36}" name="send_can_frame" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="8" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="frame" type="Raw-Can-Frame" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{e17cffd3-fdc1-4508-ad84-8e812ca691cc}" name="get_current_elapsed_time" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Function id="{224ebd65-abe0-4d04-b45b-627f175a6631}" name="CANopen_adapter" is_type="NO" language="Blackbox_C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{6b271e93-938e-4e67-8898-64c8ee59d543}" name="receive_can_frame" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="8" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="frame" type="Raw-Can-Frame" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{12085f0c-2e27-45d8-99d6-c4dc80107963}" name="send_data" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="frame" type="Can-Frame" encoding="ACN"/>
+</Provided_Interface>
+
+<Required_Interface id="{08e71e93-4624-4fc7-b29b-fb8d0b896c0d}" name="send_can_frame" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false">
+    <Input_Parameter name="frame" type="Raw-Can-Frame" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface id="{ef8f4b8f-da18-44a8-bf4c-e77c100c2639}" name="receive_data" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="frame" type="Can-Frame" encoding="ACN"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="Blackbox_C"/>
+    </Implementations>
+</Function>
+
+<Function id="{805fbc9a-043d-4e88-94df-76a91e4c74dc}" name="CANopen_processor" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{d458a674-7190-4f25-8c32-314418726cc2}" name="receive_data" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="frame" type="Can-Frame" encoding="ACN"/>
+</Provided_Interface>
+
+<Provided_Interface id="{681d29a4-3c3a-408e-86f4-e3d2a453b503}" name="canopen_network_tick" kind="Cyclic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" stack_size="1024" period="100" priority="1" dispatch_offset="0" wcet="0">
+</Provided_Interface>
+
+<Provided_Interface id="{d882423c-bb3e-480b-ab7d-4c9d6ac81d23}" name="init" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+</Provided_Interface>
+
+<Provided_Interface id="{70050d27-63b8-4d1a-8b9a-7680f73563f2}" name="change_network_state" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+</Provided_Interface>
+
+<Provided_Interface id="{0af3e16a-977a-441b-9ab7-5dfd9e45dc62}" name="issue_network_reset" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+</Provided_Interface>
+
+<Provided_Interface id="{a92572bf-7221-46b0-b165-a6964bfadcc9}" name="get_data_from_object_dictionary" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="object" type="CANopen-Object-Index" encoding="NATIVE"/>
+    <Input_Parameter name="subobject" type="CANopen-Subobject-Index" encoding="NATIVE"/>
+    <Output_Parameter name="value" type="CANopen-Value" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{ca88eec6-0a7f-4265-94c4-41ef315658ba}" name="set_data_in_object_dictionary" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="object" type="CANopen-Object-Index" encoding="NATIVE"/>
+    <Input_Parameter name="subobject" type="CANopen-Subobject-Index" encoding="NATIVE"/>
+    <Input_Parameter name="value" type="CANopen-Value" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{9c41d7d7-3ed3-42ed-b263-e86ef34a3315}" name="send_data" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="frame" type="Can-Frame" encoding="ACN"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{a2d066c4-89c7-40c4-bdac-46139ac55d9e}" name="get_current_elapsed_time" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false">
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Connection id="{1efc674b-3d07-4ce0-ae9d-6cfc23f7bdd9}" name="CANopen_processor_send_data____CANopen_adapter_send_data" required_system_element="NO">
+    <Source iface_id="{9c41d7d7-3ed3-42ed-b263-e86ef34a3315}" func_name="CANopen_processor" ri_name="send_data" />
+    <Target iface_id="{12085f0c-2e27-45d8-99d6-c4dc80107963}" func_name="CANopen_adapter" pi_name="send_data" />
+</Connection>
+
+<Connection id="{c3f4de84-4325-480b-9a54-6625bec03a33}" name="CANopen_adapter_receive_data____CANopen_processor_receive_data" required_system_element="NO">
+    <Source iface_id="{ef8f4b8f-da18-44a8-bf4c-e77c100c2639}" func_name="CANopen_adapter" ri_name="receive_data" />
+    <Target iface_id="{d458a674-7190-4f25-8c32-314418726cc2}" func_name="CANopen_processor" pi_name="receive_data" />
+</Connection>
+
+<Connection id="{baf34374-9e63-4621-8cef-1c54f511f78e}" required_system_element="NO">
+    <Source iface_id="{08e71e93-4624-4fc7-b29b-fb8d0b896c0d}" func_name="CANopen_adapter" ri_name="send_can_frame" />
+    <Target iface_id="{46d7cbef-66cc-4379-8adc-a4b751af4c36}" func_name="CANopen" ri_name="send_can_frame" />
+</Connection>
+
+<Connection id="{286dfdef-5411-40a6-8ecb-55a7a5a6ff7f}" required_system_element="NO">
+    <Source iface_id="{0d11a806-872d-41ff-84d2-3e69146573ff}" func_name="CANopen" pi_name="receive_can_frame" />
+    <Target iface_id="{6b271e93-938e-4e67-8898-64c8ee59d543}" func_name="CANopen_adapter" pi_name="receive_can_frame" />
+</Connection>
+
+<Connection id="{ce584db7-48af-4b1f-9479-1fe614b57769}" required_system_element="NO">
+    <Source iface_id="{e82fa32f-eb6f-4a86-b04e-7b3d69aba28d}" func_name="CANopen" pi_name="init" />
+    <Target iface_id="{d882423c-bb3e-480b-ab7d-4c9d6ac81d23}" func_name="CANopen_processor" pi_name="init" />
+</Connection>
+
+<Connection id="{04c8f0a9-1ef5-4952-8cc3-527412326cbf}" required_system_element="NO">
+    <Source iface_id="{37f617c1-3f7b-4cbf-9776-4a0b7d538e24}" func_name="CANopen" pi_name="change_network_state" />
+    <Target iface_id="{70050d27-63b8-4d1a-8b9a-7680f73563f2}" func_name="CANopen_processor" pi_name="change_network_state" />
+</Connection>
+
+<Connection id="{ee4f7823-74ec-4a26-94d6-89d029b28e00}" required_system_element="NO">
+    <Source iface_id="{faafd617-de95-414a-b8a2-16933de5c60d}" func_name="CANopen" pi_name="issue_network_reset" />
+    <Target iface_id="{0af3e16a-977a-441b-9ab7-5dfd9e45dc62}" func_name="CANopen_processor" pi_name="issue_network_reset" />
+</Connection>
+
+<Connection id="{d34fec13-e84b-420b-8f98-bc92da88deb2}" required_system_element="NO">
+    <Source iface_id="{a2d066c4-89c7-40c4-bdac-46139ac55d9e}" func_name="CANopen_processor" ri_name="get_current_elapsed_time" />
+    <Target iface_id="{e17cffd3-fdc1-4508-ad84-8e812ca691cc}" func_name="CANopen" ri_name="get_current_elapsed_time" />
+</Connection>
+
+<Connection id="{d8917aa9-c975-4b2b-91d3-ce0042d18860}" required_system_element="NO">
+    <Source iface_id="{6ba354e7-adbd-44e7-8f7f-3d6d8f0e1638}" func_name="CANopen" pi_name="get_data_from_object_dictionary" />
+    <Target iface_id="{a92572bf-7221-46b0-b165-a6964bfadcc9}" func_name="CANopen_processor" pi_name="get_data_from_object_dictionary" />
+</Connection>
+
+<Connection id="{99d7d805-53e2-48f8-a6bb-0f636798eeec}" required_system_element="NO">
+    <Source iface_id="{7f1e6e15-ebd2-4458-a92e-d035c90f7c56}" func_name="CANopen" pi_name="set_data_in_object_dictionary" />
+    <Target iface_id="{ca88eec6-0a7f-4265-94c4-41ef315658ba}" func_name="CANopen_processor" pi_name="set_data_in_object_dictionary" />
+</Connection>
+
+    <Implementations>
+        <Implementation name="default" language="SDL"/>
+    </Implementations>
+</Function>
+
+<Function id="{9211b821-76fe-499f-b876-fe5f8beef7bc}" name="control_interface" is_type="NO" language="GUI" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{83daae4c-4572-4341-aae1-655e12dbd053}" name="result" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="2" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="result" type="Operation-Result" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{45c9b907-6384-40fa-81c1-25bbdf73e2d1}" name="do_init" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{690dcf82-004c-418e-9808-e7fd97420fe4}" name="do_change_network_state" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{62e2f5e3-7a51-455d-9ba1-0603795c65f3}" name="do_issue_network_reset" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{294f38b1-bbba-4eba-bdb3-1d870c60a004}" name="do_get_data" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="param" type="Get-Data-Request" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{eb3bf6cd-a32a-4d30-bc72-44bfdbb5d312}" name="do_set_data" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="param" type="Set-Data-Request" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="GUI"/>
+    </Implementations>
+</Function>
+
+<Function id="{07844efa-736c-4aa3-a5c1-7d042791d088}" name="helper" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{9c97fced-4a60-4909-96b2-de2a5218258f}" name="do_init" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" priority="1" wcet="0" miat="0">
+</Provided_Interface>
+
+<Provided_Interface id="{ddb9ab1e-39d1-4e94-9256-4257a78037e8}" name="do_change_network_state" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" priority="1" wcet="0" miat="0">
+</Provided_Interface>
+
+<Provided_Interface id="{d7220cbd-375b-409c-bf2a-2247c026918c}" name="do_issue_network_reset" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" priority="1" wcet="0" miat="0">
+</Provided_Interface>
+
+<Provided_Interface id="{ae7040cd-b0c7-4718-8d8c-c4468d5c81e0}" name="do_get_data" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="param" type="Get-Data-Request" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{1b84f902-5fcf-419d-8a3a-ad0a92319c12}" name="do_set_data" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="param" type="Set-Data-Request" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{bbebf7bb-7528-47dd-89cc-cf46bb6d1bb0}" name="init" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{94a8f0b7-294b-4ae1-83f3-e43f9b325ab3}" name="change_network_state" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{0b8ab4af-0fcd-44ef-b1dc-85d41b376d1c}" name="issue_network_reset" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{ba7e33a8-78b1-40eb-aba7-0424b2b67b39}" name="get_data_from_object_dictionary" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="object" type="CANopen-Object-Index" encoding="NATIVE"/>
+    <Input_Parameter name="subobject" type="CANopen-Subobject-Index" encoding="NATIVE"/>
+    <Output_Parameter name="value" type="CANopen-Value" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{ef0149da-c2dc-46a6-953b-c87f6cbc9c60}" name="set_data_in_object_dictionary" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Input_Parameter name="object" type="CANopen-Object-Index" encoding="NATIVE"/>
+    <Input_Parameter name="subobject" type="CANopen-Subobject-Index" encoding="NATIVE"/>
+    <Input_Parameter name="value" type="CANopen-Value" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{a667640c-1c1f-4f54-9d41-5ad3524c04c5}" name="result" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="2" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="result" type="Operation-Result" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function id="{dfe831c5-6529-4df3-8d4d-9af4aa27ec70}" name="CAN_bus_mock" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{cc6b999b-d31a-4256-9b14-b5391e4417c8}" name="send_can_frame" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="8" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="frame" type="Raw-Can-Frame" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Required_Interface id="{63872a73-7936-40c6-ae5f-dc205cddcaa1}" name="receive_can_frame" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" queue_size="1" stack_size="1024" priority="1" wcet="0" miat="0">
+    <Input_Parameter name="frame" type="Raw-Can-Frame" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function id="{7307c1b7-26f7-4de9-80a6-b059fcca754f}" name="time_provider_mock" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" instances_max="1" instances_min="1">
+    <Property name="TASTE_IV_Properties::Default_Codegen" value="Ada"/>
+<Provided_Interface id="{acfc45e8-c6aa-4e20-a717-ad401e673730}" name="get_current_elapsed_time" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Connection id="{ece37790-bcc0-4e9b-9cf4-a34face446ac}" required_system_element="NO">
+    <Source iface_id="{94a8f0b7-294b-4ae1-83f3-e43f9b325ab3}" func_name="helper" ri_name="change_network_state" />
+    <Target iface_id="{37f617c1-3f7b-4cbf-9776-4a0b7d538e24}" func_name="CANopen" pi_name="change_network_state" />
+</Connection>
+
+<Connection id="{2cd7e4fe-d03f-4cb6-9c02-160f1ed1ef76}" name="helper_result____control_interface_result" required_system_element="NO">
+    <Source iface_id="{a667640c-1c1f-4f54-9d41-5ad3524c04c5}" func_name="helper" ri_name="result" />
+    <Target iface_id="{83daae4c-4572-4341-aae1-655e12dbd053}" func_name="control_interface" pi_name="result" />
+</Connection>
+
+<Connection id="{07f26b24-13ca-4886-bf63-6363e4a7c32d}" required_system_element="NO">
+    <Source iface_id="{0b8ab4af-0fcd-44ef-b1dc-85d41b376d1c}" func_name="helper" ri_name="issue_network_reset" />
+    <Target iface_id="{faafd617-de95-414a-b8a2-16933de5c60d}" func_name="CANopen" pi_name="issue_network_reset" />
+</Connection>
+
+<Connection id="{1243914e-3c73-452c-bcd3-b323acfde5e8}" name="control_interface_do_change_network_state____helper_do_change_network_state" required_system_element="NO">
+    <Source iface_id="{690dcf82-004c-418e-9808-e7fd97420fe4}" func_name="control_interface" ri_name="do_change_network_state" />
+    <Target iface_id="{ddb9ab1e-39d1-4e94-9256-4257a78037e8}" func_name="helper" pi_name="do_change_network_state" />
+</Connection>
+
+<Connection id="{4221a609-6a7f-4973-9ef3-2d66e74dc0c3}" required_system_element="NO">
+    <Source iface_id="{ba7e33a8-78b1-40eb-aba7-0424b2b67b39}" func_name="helper" ri_name="get_data_from_object_dictionary" />
+    <Target iface_id="{6ba354e7-adbd-44e7-8f7f-3d6d8f0e1638}" func_name="CANopen" pi_name="get_data_from_object_dictionary" />
+</Connection>
+
+<Connection id="{3ea84e25-bb64-4640-aa87-a263ae1132e6}" name="control_interface_do_get_data____helper_do_get_data" required_system_element="NO">
+    <Source iface_id="{294f38b1-bbba-4eba-bdb3-1d870c60a004}" func_name="control_interface" ri_name="do_get_data" />
+    <Target iface_id="{ae7040cd-b0c7-4718-8d8c-c4468d5c81e0}" func_name="helper" pi_name="do_get_data" />
+</Connection>
+
+<Connection id="{e54b1695-b967-46a2-afe4-8794b2654544}" required_system_element="NO">
+    <Source iface_id="{46d7cbef-66cc-4379-8adc-a4b751af4c36}" func_name="CANopen" ri_name="send_can_frame" />
+    <Target iface_id="{cc6b999b-d31a-4256-9b14-b5391e4417c8}" func_name="CAN_bus_mock" pi_name="send_can_frame" />
+</Connection>
+
+<Connection id="{3144117f-7793-4c5a-9da9-527234290489}" name="control_interface_do_set_data____helper_do_set_data" required_system_element="NO">
+    <Source iface_id="{eb3bf6cd-a32a-4d30-bc72-44bfdbb5d312}" func_name="control_interface" ri_name="do_set_data" />
+    <Target iface_id="{1b84f902-5fcf-419d-8a3a-ad0a92319c12}" func_name="helper" pi_name="do_set_data" />
+</Connection>
+
+<Connection id="{029ad379-1d86-4e84-9408-7dc5d3f5234b}" name="control_interface_do_issue_network_reset____helper_do_issue_network_reset" required_system_element="NO">
+    <Source iface_id="{62e2f5e3-7a51-455d-9ba1-0603795c65f3}" func_name="control_interface" ri_name="do_issue_network_reset" />
+    <Target iface_id="{d7220cbd-375b-409c-bf2a-2247c026918c}" func_name="helper" pi_name="do_issue_network_reset" />
+</Connection>
+
+<Connection id="{f7e58124-582c-49a6-b0ee-ed838c7b99fd}" name="control_interface_do_init____helper_do_init" required_system_element="NO">
+    <Source iface_id="{45c9b907-6384-40fa-81c1-25bbdf73e2d1}" func_name="control_interface" ri_name="do_init" />
+    <Target iface_id="{9c97fced-4a60-4909-96b2-de2a5218258f}" func_name="helper" pi_name="do_init" />
+</Connection>
+
+<Connection id="{1f910294-ff96-42ce-86e7-149811341efc}" required_system_element="NO">
+    <Source iface_id="{ef0149da-c2dc-46a6-953b-c87f6cbc9c60}" func_name="helper" ri_name="set_data_in_object_dictionary" />
+    <Target iface_id="{7f1e6e15-ebd2-4458-a92e-d035c90f7c56}" func_name="CANopen" pi_name="set_data_in_object_dictionary" />
+</Connection>
+
+<Connection id="{fa6c8ed4-4598-46fe-9bf2-de7d3d390b67}" required_system_element="NO">
+    <Source iface_id="{63872a73-7936-40c6-ae5f-dc205cddcaa1}" func_name="CAN_bus_mock" ri_name="receive_can_frame" />
+    <Target iface_id="{0d11a806-872d-41ff-84d2-3e69146573ff}" func_name="CANopen" pi_name="receive_can_frame" />
+</Connection>
+
+<Connection id="{dc8aa1b0-ea2b-43c2-936a-17ed10d03830}" required_system_element="NO">
+    <Source iface_id="{bbebf7bb-7528-47dd-89cc-cf46bb6d1bb0}" func_name="helper" ri_name="init" />
+    <Target iface_id="{e82fa32f-eb6f-4a86-b04e-7b3d69aba28d}" func_name="CANopen" pi_name="init" />
+</Connection>
+
+<Connection id="{f67f472c-8c6d-4b4c-ab27-fb367272e63a}" required_system_element="NO">
+    <Source iface_id="{e17cffd3-fdc1-4508-ad84-8e812ca691cc}" func_name="CANopen" ri_name="get_current_elapsed_time" />
+    <Target iface_id="{acfc45e8-c6aa-4e20-a717-ad401e673730}" func_name="time_provider_mock" pi_name="get_current_elapsed_time" />
+</Connection>
+
+<Layer name="default" is_visible="true"/>
+
+</InterfaceView>
