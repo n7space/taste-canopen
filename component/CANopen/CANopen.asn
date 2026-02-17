@@ -1,0 +1,88 @@
+CANOPEN-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+Can-Standard-Id ::= INTEGER (0 .. 2047)
+Can-Extended-Id ::= INTEGER (0 .. 536870911)
+
+Can-Id ::= CHOICE {
+  standard-id Can-Standard-Id,
+  extended-id Can-Extended-Id
+}
+
+Can-Id-Wrapper ::= SEQUENCE {
+  id Can-Id
+}
+
+Can-Frame ::= SEQUENCE {
+  id Can-Id-Wrapper,
+  data OCTET STRING (SIZE(0..8))
+}
+
+Raw-Can-Frame ::= OCTET STRING (SIZE(4..12))
+
+CANopen-Boolean ::= BOOLEAN
+CANopen-Unsigned8 ::= INTEGER(0..255)
+CANopen-Unsigned16 ::= INTEGER(0..65535)
+CANopen-Unsigned32 ::= INTEGER(0..4294967295)
+CANopen-Signed8 ::= INTEGER(-128..127)
+CANopen-Signed16 ::= INTEGER(-32768..32767)
+CANopen-Signed32 ::= INTEGER(-2147483648..2147483647)
+CANopen-Real32 ::= REAL(-1000..1000)
+
+CANopen-Object-Index ::= INTEGER(0..65535)
+CANopen-Subobject-Index ::= INTEGER(0..255)
+
+CANopen-Value ::= CHOICE {
+   boolean-d CANopen-Boolean,
+   unsigned8 CANopen-Unsigned8,
+   unsigned16 CANopen-Unsigned16,
+   unsigned32 CANopen-Unsigned32,
+   signed8 CANopen-Signed8,
+   signed16 CANopen-Signed16,
+   signed32 CANopen-Signed32,
+   real32 CANopen-Real32
+}
+
+CANopen-NMT-Command ::= ENUMERATED {
+   start,
+   stop,
+   enter-preop,
+   reset-node,
+   reset-comm
+}
+
+CANopen-NMT-State ::= ENUMERATED {
+   bootup,
+   stop,
+   start,
+   reset-node,
+   reset-comm,
+   preop
+}
+
+Time ::= SEQUENCE {
+   seconds INTEGER(0..4294967295),
+   nanoseconds INTEGER(0..4294967295)
+}
+
+-- Helper types
+
+Operation-Index ::= INTEGER (0 .. 1000000)
+
+Operation-Result ::= SEQUENCE {
+   id Operation-Index,
+   result-value CANopen-Value OPTIONAL
+}
+
+Get-Data-Request ::= SEQUENCE {
+   object CANopen-Object-Index,
+   subobject CANopen-Subobject-Index
+}
+
+Set-Data-Request ::= SEQUENCE {
+   object CANopen-Object-Index,
+   subobject CANopen-Subobject-Index,
+   data-value CANopen-Value
+}
+
+END

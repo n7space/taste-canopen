@@ -1,0 +1,20 @@
+CANOPEN-DATAVIEW DEFINITIONS ::= BEGIN
+
+Can-Id<INTEGER:det> [] {
+   standard-id [present-when det==0, size 29, encoding pos-int],
+   extended-id [present-when det==1, size 29, encoding pos-int]
+}
+
+Can-Id-Wrapper [] {
+   wypelniacz NULL [pattern '00'B],
+   det INTEGER [size 1, encoding pos-int],
+   id <det> []
+}
+
+Can-Frame [] {
+  id [],
+  data-size INTEGER [size 8, encoding pos-int],
+  data [size data-size]
+}
+
+END
