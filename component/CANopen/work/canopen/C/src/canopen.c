@@ -27,6 +27,7 @@
 
 #include "canopen.h"
 #include "config.h"
+#include "dataview-uniq.h"
 #include "lely/co/type.h"
 #include "master_dev.h"
 
@@ -111,20 +112,106 @@ static int send_callback(const struct can_msg *const msg, uint_least8_t busId,
   return 0;
 }
 
+static asn1SccCANopen_NMT_Command map_nmt_command_to_asn(co_unsigned8_t cs) {
+  switch (cs) {
+  case CO_NMT_CS_START:
+    return asn1SccCANopen_NMT_Command_start;
+  case CO_NMT_CS_STOP:
+    return asn1SccCANopen_NMT_Command_stop;
+  case CO_NMT_CS_ENTER_PREOP:
+    return asn1SccCANopen_NMT_Command_enter_preop;
+  case CO_NMT_CS_RESET_NODE:
+    return asn1SccCANopen_NMT_Command_reset_node;
+  case CO_NMT_CS_RESET_COMM:
+    return asn1SccCANopen_NMT_Command_reset_comm;
+  default:
+    printf("[CANopen] Warning: Unknown NMT command: 0x%02x\n", cs);
+    return asn1SccCANopen_NMT_Command_start;
+  }
+}
+
+static asn1SccCANopen_NMT_State map_nmt_state_to_asn(co_unsigned8_t st) {
+  // Mask off the toggle bit
+  co_unsigned8_t state = st & ~CO_NMT_ST_TOGGLE;
+
+  switch (state) {
+  case CO_NMT_ST_BOOTUP:
+    return asn1SccCANopen_NMT_State_bootup;
+  case CO_NMT_ST_STOP:
+    return asn1SccCANopen_NMT_State_stop;
+  case CO_NMT_ST_START:
+    return asn1SccCANopen_NMT_State_start;
+  case CO_NMT_ST_RESET_NODE:
+    return asn1SccCANopen_NMT_State_reset_node;
+  case CO_NMT_ST_RESET_COMM:
+    return asn1SccCANopen_NMT_State_reset_comm;
+  case CO_NMT_ST_PREOP:
+    return asn1SccCANopen_NMT_State_preop;
+  default:
+    printf("[CANopen] Warning: Unknown NMT state: 0x%02x\n", st);
+    return asn1SccCANopen_NMT_State_bootup;
+  }
+}
+
+static const char *map_nmt_command_to_string(co_unsigned8_t cs) {
+  switch (cs) {
+  case CO_NMT_CS_START:
+    return "START";
+  case CO_NMT_CS_STOP:
+    return "STOP";
+  case CO_NMT_CS_ENTER_PREOP:
+    return "ENTER_PREOP";
+  case CO_NMT_CS_RESET_NODE:
+    return "RESET_NODE";
+  case CO_NMT_CS_RESET_COMM:
+    return "RESET_COMM";
+  default:
+    return "UNKNOWN";
+  }
+}
+
+static const char *map_nmt_state_to_string(co_unsigned8_t st) {
+  // Mask off the toggle bit
+  co_unsigned8_t state = st & ~CO_NMT_ST_TOGGLE;
+
+  switch (state) {
+  case CO_NMT_ST_BOOTUP:
+    return "BOOTUP";
+  case CO_NMT_ST_STOP:
+    return "STOP";
+  case CO_NMT_ST_START:
+    return "START";
+  case CO_NMT_ST_RESET_NODE:
+    return "RESET_NODE";
+  case CO_NMT_ST_RESET_COMM:
+    return "RESET_COMM";
+  case CO_NMT_ST_PREOP:
+    return "PREOP";
+  default:
+    return "UNKNOWN";
+  }
+}
+
 static void nmt_command_indicator(co_nmt_t *nmt_, co_unsigned8_t cs,
                                   void *data) {
   assert(nmt_ == nmt);
   (void)data;
-  printf("[CANopen] NMT command indicator triggered; received command: %x\n",
-         cs);
+  printf(
+      "[CANopen] NMT command indicator triggered; received command: %x (%s) \n",
+      cs, map_nmt_command_to_string(cs));
+  const asn1SccCANopen_NMT_Command asnCs = map_nmt_command_to_asn(cs);
+  canopen_RI_nmt_command_indicator(&asnCs);
 }
 
 static void nmt_state_indicator(co_nmt_t *nmt_, co_unsigned8_t id,
                                 co_unsigned8_t st, void *data) {
   assert(nmt_ == nmt);
   (void)data;
-  printf("[CANopen] NMT state indicator triggered; ID: %x, state: %x\n", id,
-         st);
+  printf("[CANopen] NMT state indicator triggered; ID: %x, state: %x (%s)\n",
+         id, st, map_nmt_state_to_string(st));
+  const asn1SccCANopen_NMT_State asnSt = map_nmt_state_to_asn(st);
+  const asn1SccCANopen_Unsigned8 asnId = id;
+  canopen_RI_nmt_state_indicator(&asnId, &asnSt);
 }
 
 void canopen_startup(void) {
@@ -176,11 +263,11 @@ void canopen_PI_canopen_network_tick(void) {
     return;
   }
 
-  static uint32_t counter = 0;
-
   struct timespec currentTime = get_time_from_startup();
   can_net_set_time(net, &currentTime);
 
+  // TODO: this is debug log, probably kill
+  static uint32_t counter = 0;
   if (counter % 100 == 0)
     printf("[CANopen] Current network time: %lds, %ldns\n", currentTime.tv_sec,
            currentTime.tv_nsec);
@@ -188,14 +275,47 @@ void canopen_PI_canopen_network_tick(void) {
   counter++;
 }
 
-void canopen_PI_change_network_state(void) {
-  if (net == NULL || nmt == NULL) {
+void canopen_PI_change_network_state(const asn1SccCANopen_NMT_State *state) {
+  if (net == NULL || nmt == NULL || state == NULL) {
     return;
   }
 
-  // TODO: Implement NMT state changes
-  // Probably requires a new type for the state argument.
-  // Example: co_nmt_cs_ind(nmt, CO_NMT_CS_START);
+  // Map ASN.1 NMT state to Lely CANopen NMT command specifier
+  co_unsigned8_t cs;
+  switch (*state) {
+  case CANopen_NMT_State_start:
+    cs = CO_NMT_CS_START;
+    break;
+  case CANopen_NMT_State_stop:
+    cs = CO_NMT_CS_STOP;
+    break;
+  case CANopen_NMT_State_preop:
+    cs = CO_NMT_CS_ENTER_PREOP;
+    break;
+  case CANopen_NMT_State_reset_node:
+    cs = CO_NMT_CS_RESET_NODE;
+    break;
+  case CANopen_NMT_State_reset_comm:
+    cs = CO_NMT_CS_RESET_COMM;
+    break;
+  case CANopen_NMT_State_bootup:
+    // Bootup is not a command that can be issued externally
+    printf("[CANopen] Warning: Cannot transition to bootup state via "
+           "command\n");
+    return;
+  default:
+    printf("[CANopen] Error: Unknown NMT state: %d\n", *state);
+    return;
+  }
+
+  // Issue the NMT command
+  printf("[CANopen] Changing network state to: %d (command: 0x%02X)\n", *state,
+         cs);
+  int result = co_nmt_cs_ind(nmt, cs);
+  if (result != 0) {
+    printf("[CANopen] Error: Failed to change network state (error code: %d)\n",
+           result);
+  }
 }
 
 void canopen_PI_issue_network_reset(void) {
@@ -275,13 +395,13 @@ void canopen_PI_set_object_dictionary_data(
 
   co_obj_t *obj = co_dev_find_obj(dev, (co_unsigned16_t)(*index));
   if (obj == NULL) {
-    printf("[CANopen] ERROR: Object 0x%04lX not found\n", *index);
+    printf("[CANopen] ERROR: Object %04lX not found\n", *index);
     return;
   }
 
   co_sub_t *sub = co_obj_find_sub(obj, (co_unsigned8_t)(*subindex));
   if (sub == NULL) {
-    printf("[CANopen] ERROR: Sub-object 0x%04lX:%02lX not found\n", *index,
+    printf("[CANopen] ERROR: Sub-object %04lX:%02lX not found\n", *index,
            *subindex);
     return;
   }
@@ -317,7 +437,7 @@ void canopen_PI_set_object_dictionary_data(
     return;
   }
 
-  printf("[CANopen] Set OD 0x%04lX:%02lX\n", *index, *subindex);
+  printf("[CANopen] Set OD %04lX:%02lX\n", *index, *subindex);
 }
 
 void canopen_PI_get_object_dictionary_data(
@@ -330,13 +450,13 @@ void canopen_PI_get_object_dictionary_data(
 
   co_obj_t *obj = co_dev_find_obj(dev, (co_unsigned16_t)(*index));
   if (obj == NULL) {
-    printf("[CANopen] ERROR: Object 0x%04lX not found\n", *index);
+    printf("[CANopen] ERROR: Object %04lX not found\n", *index);
     return;
   }
 
   co_sub_t *sub = co_obj_find_sub(obj, (co_unsigned8_t)(*subindex));
   if (sub == NULL) {
-    printf("[CANopen] ERROR: Sub-object 0x%04lX:%02lX not found\n", *index,
+    printf("[CANopen] ERROR: Sub-object %04lX:%02lX not found\n", *index,
            *subindex);
     return;
   }
@@ -382,5 +502,5 @@ void canopen_PI_get_object_dictionary_data(
     break;
   }
 
-  printf("[CANopen] Get OD 0x%04lX:%02lX\n", *index, *subindex);
+  printf("[CANopen] Get OD %04lX:%02lX\n", *index, *subindex);
 }

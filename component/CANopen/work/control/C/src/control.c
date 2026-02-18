@@ -8,6 +8,7 @@
     !! file. The up-to-date signatures can be found in the header file. !!
 */
 #include "control.h"
+#include "dataview-uniq.h"
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -21,18 +22,89 @@ void control_PI_trigger(void) {
   static uint32_t ticks = 0;
   static bool initTriggered = false;
   static bool networkResetTriggered = false;
+  static bool stateChangeTriggered = false;
+
+  const uint16_t odObjectIndex = 0x2002;
+  const uint8_t odObjectSubIndex = 0x0;
+  static int16_t odValue = 0x1234;
 
   if (!initTriggered) {
-    printf("[helper] Triggering initialization...\n");
+    printf("[control] Triggering initialization...\n");
     control_RI_do_init();
     initTriggered = true;
   }
 
   if (ticks == 1 && !networkResetTriggered) {
-    printf("[helper] Triggering network reset...\n");
+    printf("[control] Triggering network reset...\n");
     control_RI_do_reset();
     networkResetTriggered = true;
   }
 
+  if (ticks > 2 && ticks % 2 == 0) {
+    printf("[control] Requesting OD value @ %04X:%02X...\n", odObjectIndex,
+           odObjectSubIndex);
+    const asn1SccGet_Data_Request request = {.object = odObjectIndex,
+                                             .subobject = odObjectSubIndex};
+    control_RI_objdict_get(&request);
+  }
+
+  if (ticks > 2 && ticks % 2 == 1) {
+    printf("[control] Setting OD value @ %04X:%02X = 0x%04X...\n",
+           odObjectIndex, odObjectSubIndex, odValue);
+    const asn1SccSet_Data_Request request = {
+        .object = odObjectIndex,
+        .subobject = odObjectSubIndex,
+        .data_value = {.kind = CANopen_Value_signed16_PRESENT,
+                       .u = {.signed16 = odValue}}};
+    control_RI_objdict_set(&request);
+
+    odValue++;
+  }
+
+  if (ticks == 10 && !stateChangeTriggered) {
+    printf("[control] Triggering state change...\n");
+    const asn1SccCANopen_NMT_State newState = CANopen_NMT_State_stop;
+    control_RI_change_network_state(&newState);
+    stateChangeTriggered = true;
+  }
+
   ticks++;
+}
+
+void control_PI_objdict_get_result(const asn1SccGet_Data_Response *response) {
+  printf("[control] Received object dictionary value: %04lX:%02lX = ",
+         response->object, response->subobject);
+
+  switch (response->data_value.kind) {
+  case CANopen_Value_boolean_d_PRESENT:
+    printf("0x%s\n", response->data_value.u.boolean_d ? "true" : "false");
+    break;
+  case CANopen_Value_unsigned8_PRESENT:
+    printf("0x%02lX\n", response->data_value.u.unsigned8);
+    break;
+  case CANopen_Value_unsigned16_PRESENT:
+    printf("0x%04lX\n", response->data_value.u.unsigned16);
+    break;
+  case CANopen_Value_unsigned32_PRESENT:
+    printf("0x%08lX\n", response->data_value.u.unsigned32);
+    break;
+  case CANopen_Value_signed8_PRESENT:
+    printf("0x%02lX (%li)\n", response->data_value.u.signed8,
+           response->data_value.u.signed8);
+    break;
+  case CANopen_Value_signed16_PRESENT:
+    printf("0x%04lX (%li)\n", response->data_value.u.signed16,
+           response->data_value.u.signed16);
+    break;
+  case CANopen_Value_signed32_PRESENT:
+    printf("0x%08lX (%li)\n", response->data_value.u.signed32,
+           response->data_value.u.signed32);
+    break;
+  case CANopen_Value_real32_PRESENT:
+    printf("%lf\n", response->data_value.u.real32);
+    break;
+  default:
+    printf("(unknown type)\n");
+    break;
+  }
 }

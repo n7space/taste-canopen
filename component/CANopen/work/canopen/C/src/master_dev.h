@@ -10,7 +10,7 @@
 
 static co_dev_t master_dev = {
 	.netid = 0,
-	.id = 2,
+	.id = 1,
 	.tree = { .cmp = &uint16_cmp },
 #if !LELY_NO_CO_OBJ_NAME
 	.name = CO_DEV_STRING(""),
@@ -200,6 +200,48 @@ static co_sub_t master_dev_1006sub0 = {
 };
 
 static struct {
+	co_unsigned16_t sub0;
+} master_dev_1017_val = {
+	.sub0 = 0x01F4,
+};
+
+static co_obj_t master_dev_1017 = {
+	.node = { .key = &master_dev_1017.idx },
+	.idx = 0x1017,
+	.code = CO_OBJECT_VAR,
+#if !LELY_NO_CO_OBJ_NAME
+	.name = CO_DEV_STRING("Producer Heartbeat Time"),
+#endif
+	.tree = { .cmp = &uint8_cmp },
+	.val = &master_dev_1017_val,
+	.size = sizeof(master_dev_1017_val)
+};
+
+static co_sub_t master_dev_1017sub0 = {
+	.node = { .key = &master_dev_1017sub0.subidx },
+	.subidx = 0x00,
+	.type = CO_DEFTYPE_UNSIGNED16,
+#if !LELY_NO_CO_OBJ_NAME
+	.name = CO_DEV_STRING("Producer Heartbeat Time"),
+#endif
+#if !LELY_NO_CO_OBJ_LIMITS
+	.min = { .u16 = CO_UNSIGNED16_MIN },
+	.max = { .u16 = CO_UNSIGNED16_MAX },
+#endif
+#if !LELY_NO_CO_OBJ_DEFAULT
+	.def = { .u16 = 0x01F4 },
+#endif
+	.val = &master_dev_1017_val.sub0,
+	.access = CO_ACCESS_RW,
+	.pdo_mapping = 0,
+	.flags = 0,
+	.dn_ind = &co_sub_default_dn_ind,
+#if !LELY_NO_CO_OBJ_UPLOAD
+	.up_ind = &co_sub_default_up_ind
+#endif
+};
+
+static struct {
 	co_unsigned8_t sub0;
 	co_unsigned32_t sub1;
 	co_unsigned32_t sub2;
@@ -345,6 +387,48 @@ static co_sub_t master_dev_1018sub4 = {
 #endif
 };
 
+static struct {
+	co_integer16_t sub0;
+} master_dev_2002_val = {
+	.sub0 = 30292,
+};
+
+static co_obj_t master_dev_2002 = {
+	.node = { .key = &master_dev_2002.idx },
+	.idx = 0x2002,
+	.code = CO_OBJECT_VAR,
+#if !LELY_NO_CO_OBJ_NAME
+	.name = CO_DEV_STRING("TestInteger16"),
+#endif
+	.tree = { .cmp = &uint8_cmp },
+	.val = &master_dev_2002_val,
+	.size = sizeof(master_dev_2002_val)
+};
+
+static co_sub_t master_dev_2002sub0 = {
+	.node = { .key = &master_dev_2002sub0.subidx },
+	.subidx = 0x00,
+	.type = CO_DEFTYPE_INTEGER16,
+#if !LELY_NO_CO_OBJ_NAME
+	.name = CO_DEV_STRING("TestInteger16"),
+#endif
+#if !LELY_NO_CO_OBJ_LIMITS
+	.min = { .i16 = CO_INTEGER16_MIN },
+	.max = { .i16 = CO_INTEGER16_MAX },
+#endif
+#if !LELY_NO_CO_OBJ_DEFAULT
+	.def = { .i16 = 30292 },
+#endif
+	.val = &master_dev_2002_val.sub0,
+	.access = CO_ACCESS_RW,
+	.pdo_mapping = 0,
+	.flags = 0,
+	.dn_ind = &co_sub_default_dn_ind,
+#if !LELY_NO_CO_OBJ_UPLOAD
+	.up_ind = &co_sub_default_up_ind
+#endif
+};
+
 // suppress missing-prototype warning
 co_dev_t * master_dev_init(void);
 co_dev_t *
@@ -365,12 +449,18 @@ master_dev_init(void) {
 		co_dev_insert_obj(&master_dev, &master_dev_1006);
 		co_obj_insert_sub(&master_dev_1006, &master_dev_1006sub0);
 
+		co_dev_insert_obj(&master_dev, &master_dev_1017);
+		co_obj_insert_sub(&master_dev_1017, &master_dev_1017sub0);
+
 		co_dev_insert_obj(&master_dev, &master_dev_1018);
 		co_obj_insert_sub(&master_dev_1018, &master_dev_1018sub0);
 		co_obj_insert_sub(&master_dev_1018, &master_dev_1018sub1);
 		co_obj_insert_sub(&master_dev_1018, &master_dev_1018sub2);
 		co_obj_insert_sub(&master_dev_1018, &master_dev_1018sub3);
 		co_obj_insert_sub(&master_dev_1018, &master_dev_1018sub4);
+
+		co_dev_insert_obj(&master_dev, &master_dev_2002);
+		co_obj_insert_sub(&master_dev_2002, &master_dev_2002sub0);
 	}
 	return dev;
 }

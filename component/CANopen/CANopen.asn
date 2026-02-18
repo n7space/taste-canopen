@@ -79,6 +79,12 @@ Get-Data-Request ::= SEQUENCE {
    subobject CANopen-Subobject-Index
 }
 
+Get-Data-Response ::= SEQUENCE {
+   object CANopen-Object-Index,
+   subobject CANopen-Subobject-Index,
+   data-value CANopen-Value
+}
+
 Set-Data-Request ::= SEQUENCE {
    object CANopen-Object-Index,
    subobject CANopen-Subobject-Index,

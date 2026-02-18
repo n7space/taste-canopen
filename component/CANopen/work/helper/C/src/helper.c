@@ -8,6 +8,7 @@
     !! file. The up-to-date signatures can be found in the header file. !!
 */
 #include "helper.h"
+#include "dataview-uniq.h"
 #include <stdio.h>
 
 void helper_startup(void) {
@@ -19,3 +20,25 @@ void helper_startup(void) {
 void helper_PI_do_init(void) { helper_RI_init(); }
 
 void helper_PI_do_reset(void) { helper_RI_issue_network_reset(); }
+
+void helper_PI_change_network_state(const asn1SccCANopen_NMT_State *state) {
+  helper_RI_change_network_state(state);
+}
+
+void helper_PI_objdict_get(const asn1SccGet_Data_Request *request) {
+  const asn1SccCANopen_Object_Index index = request->object;
+  const asn1SccCANopen_Subobject_Index subIndex = request->subobject;
+  asn1SccCANopen_Value value;
+
+  helper_RI_get_object_dictionary_data(&index, &subIndex, &value);
+
+  const asn1SccGet_Data_Response response = {
+      .object = index, .subobject = subIndex, .data_value = value};
+
+  helper_RI_objdict_get_result(&response);
+}
+
+void helper_PI_objdict_set(const asn1SccSet_Data_Request *request) {
+  helper_RI_set_object_dictionary_data(&request->object, &request->subobject,
+                                       &request->data_value);
+}
