@@ -20,14 +20,10 @@ SupportedObjects=3
 3=0x1018
 
 [OptionalObjects]
-SupportedObjects=3
-1=0x1005
-2=0x1006
-3=0x1017
+SupportedObjects=0
 
 [ManufacturerObjects]
-SupportedObjects=1
-1=0x2002
+SupportedObjects=0
 
 [1000]
 ParameterName=Device type
@@ -38,27 +34,6 @@ AccessType=ro
 ParameterName=Error register
 DataType=0x0005
 AccessType=ro
-
-[1005]
-ParameterName=COB-ID SYNC
-DataType=0x0007
-AccessType=rw
-ParameterValue=0x40000080
-DefaultValue=0x00000080
-
-[1006]
-ParameterName=Communication cycle period
-DataType=0x0007
-AccessType=rw
-DefaultValue=500000
-
-[1017]
-ParameterName=Producer Heartbeat Time
-ObjectType=0x07
-DataType=0x0006
-AccessType=rw
-DefaultValue=500
-PDOMapping=0
 
 [1018]
 SubNumber=5
@@ -92,8 +67,3 @@ ParameterName=Serial number
 DataType=0x0007
 AccessType=ro
 
-[2002]
-ParameterName=TestInteger16
-DataType=0x0003
-AccessType=rw
-DefaultValue=0x7654
