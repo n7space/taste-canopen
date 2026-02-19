@@ -11,6 +11,7 @@
 #include <lely/co/nmt.h>
 #include <lely/co/obj.h>
 #include <lely/co/sync.h>
+#include <lely/co/type.h>
 #include <lely/util/cmp.h>
 #include <lely/util/memory.h>
 #include <lely/util/mempool.h>
@@ -20,7 +21,6 @@
 #include "canopen_utils.h"
 #include "config.h"
 #include "dataview-uniq.h"
-#include "lely/co/type.h"
 #include "master_dev.h"
 
 #ifdef CANOPEN_DEBUG
