@@ -1,7 +1,6 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <string.h>
 #include <time.h>
 
@@ -23,6 +22,13 @@
 #include "dataview-uniq.h"
 #include "lely/co/type.h"
 #include "master_dev.h"
+
+#ifdef CANOPEN_DEBUG
+#include <stdio.h>
+#define DEBUG_PRINT(...) printf(__VA_ARGS__)
+#else
+#define DEBUG_PRINT(...) ((void)0)
+#endif
 
 #define MEMORY_POOL_SIZE (10 * 1024 * 1024)
 
@@ -131,7 +137,7 @@ static void nmt_command_indicator(co_nmt_t *nmt_, co_unsigned8_t cs,
   assert(nmt_ == nmt);
   (void)data;
 
-  printf(
+  DEBUG_PRINT(
       "[CANopen] NMT command indicator triggered; received command: %X (%s) \n",
       cs, map_nmt_command_to_string(cs));
 
@@ -143,8 +149,9 @@ static void nmt_state_indicator(co_nmt_t *nmt_, co_unsigned8_t id,
                                 co_unsigned8_t st, void *data) {
   assert(nmt_ == nmt);
   (void)data;
-  printf("[CANopen] NMT state indicator triggered; ID: %X, state: %X (%s)\n",
-         id, st, map_nmt_state_to_string(st));
+  DEBUG_PRINT(
+      "[CANopen] NMT state indicator triggered; ID: %X, state: %X (%s)\n", id,
+      st, map_nmt_state_to_string(st));
 
   const asn1SccCANopen_NMT_State asnSt = map_nmt_state_to_asn(st);
   const asn1SccCANopen_Unsigned8 asnId = id;
@@ -156,10 +163,11 @@ static void nmt_hearbeat_indicator(co_nmt_t *nmt_, co_unsigned8_t id,
                                    co_nmt_ec_reason_t reason, void *data) {
   assert(nmt_ == nmt);
   (void)data;
-  printf("[CANopen] NMT heartbeat received from node %02X, state: %X (%s), "
-         "reason: %X (%s)\n",
-         id, state_, map_nmt_ec_state_to_string(state_), reason,
-         map_nmt_ec_reason_to_string(reason));
+  DEBUG_PRINT(
+      "[CANopen] NMT heartbeat received from node %02X, state: %X (%s), "
+      "reason: %X (%s)\n",
+      id, state_, map_nmt_ec_state_to_string(state_), reason,
+      map_nmt_ec_reason_to_string(reason));
 
   const asn1SccCANopen_NodeID asnNodeId = id;
   const asn1SccCANopen_NMT_HeartbeatState asnHbState =
@@ -173,7 +181,7 @@ static void nmt_sync_indicator(co_sync_t *sync_, co_unsigned8_t cnt,
                                void *data) {
   assert(sync_ == sync);
   (void)data;
-  printf("[CANopen] NMT sync received, counter: %X\n", cnt);
+  DEBUG_PRINT("[CANopen] NMT sync received, counter: %X\n", cnt);
 
   const asn1SccCANopen_Unsigned8 asnCounter = cnt;
   canopen_RI_nmt_sync_indicator(&asnCounter);
@@ -186,36 +194,36 @@ void canopen_startup(void) {
 void canopen_PI_init(void) {
   if (net != NULL) {
     // Already initialized
-    printf("[CANopen] Already initialized, ignoring init...\n");
+    DEBUG_PRINT("[CANopen] Already initialized, ignoring init...\n");
     return;
   }
 
-  printf("[CANopen] Initializing...\n");
+  DEBUG_PRINT("[CANopen] Initializing...\n");
 
   // Initialize device from static object dictionary
   dev = master_dev_init();
   if (dev == NULL) {
-    printf("[CANopen] ERROR: Failed to initialize device\n");
+    DEBUG_PRINT("[CANopen] ERROR: Failed to initialize device\n");
     return;
   }
 
   // Create CAN network
   net = can_net_create(allocator_init(), 0);
   if (net == NULL) {
-    printf("[CANopen] ERROR: Failed to create CAN network\n");
+    DEBUG_PRINT("[CANopen] ERROR: Failed to create CAN network\n");
     return;
   }
 
   // Create NMT service
   nmt = co_nmt_create(net, dev);
   if (nmt == NULL) {
-    printf("[CANopen] ERROR: Failed to create NMT service\n");
+    DEBUG_PRINT("[CANopen] ERROR: Failed to create NMT service\n");
     return;
   }
 
   sync = co_nmt_get_sync(nmt);
   if (sync == NULL) {
-    printf(
+    DEBUG_PRINT(
         "[CANopen] ERROR: NMT service manager failed to create SYNC service\n");
     return;
   }
@@ -229,7 +237,7 @@ void canopen_PI_init(void) {
 
   startupTime = get_current_time();
 
-  printf("[CANopen] Initialization complete\n");
+  DEBUG_PRINT("[CANopen] Initialization complete\n");
 }
 
 void canopen_PI_canopen_network_tick(void) {
@@ -243,8 +251,8 @@ void canopen_PI_canopen_network_tick(void) {
   // TODO: this is debug log, probably kill
   static uint32_t counter = 0;
   if (counter % 100 == 0)
-    printf("[CANopen] Current network time: %lds, %ldns\n", currentTime.tv_sec,
-           currentTime.tv_nsec);
+    DEBUG_PRINT("[CANopen] Current network time: %lds, %ldns\n",
+                currentTime.tv_sec, currentTime.tv_nsec);
 
   counter++;
 }
@@ -274,21 +282,22 @@ void canopen_PI_change_node_state(const asn1SccCANopen_NMT_State *state) {
     break;
   case asn1SccCANopen_NMT_State_bootup:
     // Bootup is not a command that can be issued externally
-    printf("[CANopen] Warning: Cannot transition to bootup state via "
-           "command\n");
+    DEBUG_PRINT("[CANopen] Warning: Cannot transition to bootup state via "
+                "command\n");
     return;
   default:
-    printf("[CANopen] Error: Unknown NMT state: %d\n", *state);
+    DEBUG_PRINT("[CANopen] Error: Unknown NMT state: %d\n", *state);
     return;
   }
 
   // Issue the NMT command
-  printf("[CANopen] Changing network state to: %d (command: 0x%02X)\n", *state,
-         cs);
+  DEBUG_PRINT("[CANopen] Changing network state to: %d (command: 0x%02X)\n",
+              *state, cs);
   int result = co_nmt_cs_ind(nmt, cs);
   if (result != 0) {
-    printf("[CANopen] Error: Failed to change network state (error code: %d)\n",
-           result);
+    DEBUG_PRINT(
+        "[CANopen] Error: Failed to change network state (error code: %d)\n",
+        result);
   }
 }
 
@@ -298,7 +307,7 @@ void canopen_PI_reset_node(void) {
   }
 
   // Issue NMT reset node command
-  printf("[CANopen] Network reset triggered!\n");
+  DEBUG_PRINT("[CANopen] Network reset triggered!\n");
   co_nmt_cs_ind(nmt, CO_NMT_CS_RESET_NODE);
 }
 
@@ -308,12 +317,12 @@ void canopen_PI_issue_slave_command(
 
   co_unsigned8_t nodeId = *asnNodeId;
   co_unsigned8_t command = map_nmt_command_from_asn(*asnCommand);
-  printf("[CANopen] Issuing command %X (%s) to node %X\n", command,
-         map_nmt_command_to_string(command), nodeId);
+  DEBUG_PRINT("[CANopen] Issuing command %X (%s) to node %X\n", command,
+              map_nmt_command_to_string(command), nodeId);
 
   if (co_nmt_cs_req(nmt, command, nodeId) != 0) {
-    printf("[CANopen] NMT command request %X (%s) to node %X failed!\n",
-           command, map_nmt_command_to_string(command), nodeId);
+    DEBUG_PRINT("[CANopen] NMT command request %X (%s) to node %X failed!\n",
+                command, map_nmt_command_to_string(command), nodeId);
   }
 }
 
@@ -327,14 +336,14 @@ void canopen_PI_set_object_dictionary_data(
 
   co_obj_t *obj = co_dev_find_obj(dev, (co_unsigned16_t)(*index));
   if (obj == NULL) {
-    printf("[CANopen] ERROR: Object %04lX not found\n", *index);
+    DEBUG_PRINT("[CANopen] ERROR: Object %04lX not found\n", *index);
     return;
   }
 
   co_sub_t *sub = co_obj_find_sub(obj, (co_unsigned8_t)(*subindex));
   if (sub == NULL) {
-    printf("[CANopen] ERROR: Sub-object %04lX:%02lX not found\n", *index,
-           *subindex);
+    DEBUG_PRINT("[CANopen] ERROR: Sub-object %04lX:%02lX not found\n", *index,
+                *subindex);
     return;
   }
 
@@ -375,18 +384,19 @@ void canopen_PI_set_object_dictionary_data(
     bytes_written = co_sub_set_val_r32(sub, (co_real32_t)value->u.real32);
     break;
   default:
-    printf("[CANopen] ERROR: Unsupported value type 0x%04X\n", value->kind);
+    DEBUG_PRINT("[CANopen] ERROR: Unsupported value type 0x%04X\n",
+                value->kind);
     return;
   }
 
   if (bytes_written == 0) {
-    printf("[CANopen] ERROR: Failed to write value to OD %04lX:%02lX\n", *index,
-           *subindex);
+    DEBUG_PRINT("[CANopen] ERROR: Failed to write value to OD %04lX:%02lX\n",
+                *index, *subindex);
     return;
   }
 
-  printf("[CANopen] Set OD %04lX:%02lX successful (%zu bytes written)\n",
-         *index, *subindex, bytes_written);
+  DEBUG_PRINT("[CANopen] Set OD %04lX:%02lX successful (%zu bytes written)\n",
+              *index, *subindex, bytes_written);
 }
 
 void canopen_PI_get_object_dictionary_data(
@@ -399,14 +409,14 @@ void canopen_PI_get_object_dictionary_data(
 
   co_obj_t *obj = co_dev_find_obj(dev, (co_unsigned16_t)(*index));
   if (obj == NULL) {
-    printf("[CANopen] ERROR: Object %04lX not found\n", *index);
+    DEBUG_PRINT("[CANopen] ERROR: Object %04lX not found\n", *index);
     return;
   }
 
   co_sub_t *sub = co_obj_find_sub(obj, (co_unsigned8_t)(*subindex));
   if (sub == NULL) {
-    printf("[CANopen] ERROR: Sub-object %04lX:%02lX not found\n", *index,
-           *subindex);
+    DEBUG_PRINT("[CANopen] ERROR: Sub-object %04lX:%02lX not found\n", *index,
+                *subindex);
     return;
   }
 
@@ -455,9 +465,9 @@ void canopen_PI_get_object_dictionary_data(
     value->u.real32 = co_sub_get_val_r32(sub);
     break;
   default:
-    printf("[CANopen] ERROR: Unsupported value type 0x%04X\n", type);
+    DEBUG_PRINT("[CANopen] ERROR: Unsupported value type 0x%04X\n", type);
     break;
   }
 
-  printf("[CANopen] Get OD %04lX:%02lX successful\n", *index, *subindex);
+  DEBUG_PRINT("[CANopen] Get OD %04lX:%02lX successful\n", *index, *subindex);
 }
