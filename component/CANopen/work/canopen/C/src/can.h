@@ -21,9 +21,10 @@
 #ifndef LELY_CAN_INTERN_CAN_H_
 #define LELY_CAN_INTERN_CAN_H_
 
-#ifdef HAVE_CONFIG_H
+// Note: This ifdef is commented out for this TASTE function, as `config.h` is included with the source code.
+// #ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
+// #endif
 
 #include <lely/compat/features.h>
 
