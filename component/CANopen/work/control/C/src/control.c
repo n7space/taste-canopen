@@ -23,6 +23,7 @@ void control_PI_trigger(void) {
   static bool initTriggered = false;
   static bool networkResetTriggered = false;
   static bool stateChangeTriggered = false;
+  static bool slaveChangeTriggered = false;
 
   const uint16_t odObjectIndex = 0x2002;
   const uint8_t odObjectSubIndex = 0x0;
@@ -61,10 +62,19 @@ void control_PI_trigger(void) {
     odValue++;
   }
 
-  if (ticks == 10 && !stateChangeTriggered) {
+  if (ticks == 3 && !slaveChangeTriggered) {
+    printf("[control] Triggering slave node command (may fail when other node "
+           "is not present)...\n");
+    const asn1SccNode_Command_Request request = {
+        .node_id = 10, .command = asn1SccCANopen_NMT_Command_reset_node};
+    control_RI_issue_slave_command(&request);
+    slaveChangeTriggered = true;
+  }
+
+  if (ticks == 5 && !stateChangeTriggered) {
     printf("[control] Triggering state change...\n");
     const asn1SccCANopen_NMT_State newState = CANopen_NMT_State_stop;
-    control_RI_change_network_state(&newState);
+    control_RI_change_node_state(&newState);
     stateChangeTriggered = true;
   }
 

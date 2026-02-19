@@ -9,7 +9,6 @@
 */
 #include "helper.h"
 #include "dataview-uniq.h"
-#include <stdio.h>
 
 void helper_startup(void) {
   // Write your initialisation code
@@ -19,21 +18,25 @@ void helper_startup(void) {
 
 void helper_PI_do_init(void) { helper_RI_init(); }
 
-void helper_PI_do_reset(void) { helper_RI_issue_network_reset(); }
+void helper_PI_do_reset(void) { helper_RI_reset_node(); }
 
-void helper_PI_change_network_state(const asn1SccCANopen_NMT_State *state) {
-  helper_RI_change_network_state(state);
+void helper_PI_change_node_state(const asn1SccCANopen_NMT_State *state) {
+  helper_RI_change_node_state(state);
+}
+
+void helper_PI_issue_slave_command(const asn1SccNode_Command_Request *request) {
+  helper_RI_issue_slave_command(&request->node_id, &request->command);
 }
 
 void helper_PI_objdict_get(const asn1SccGet_Data_Request *request) {
-  const asn1SccCANopen_Object_Index index = request->object;
-  const asn1SccCANopen_Subobject_Index subIndex = request->subobject;
   asn1SccCANopen_Value value;
 
-  helper_RI_get_object_dictionary_data(&index, &subIndex, &value);
+  helper_RI_get_object_dictionary_data(&request->object, &request->subobject,
+                                       &value);
 
-  const asn1SccGet_Data_Response response = {
-      .object = index, .subobject = subIndex, .data_value = value};
+  const asn1SccGet_Data_Response response = {.object = request->object,
+                                             .subobject = request->subobject,
+                                             .data_value = value};
 
   helper_RI_objdict_get_result(&response);
 }
