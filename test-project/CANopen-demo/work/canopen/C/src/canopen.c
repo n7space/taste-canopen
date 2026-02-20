@@ -11,6 +11,7 @@
 #include <lely/co/nmt.h>
 #include <lely/co/obj.h>
 #include <lely/co/sync.h>
+#include <lely/co/type.h>
 #include <lely/util/cmp.h>
 #include <lely/util/memory.h>
 #include <lely/util/mempool.h>
@@ -20,21 +21,15 @@
 #include "canopen_utils.h"
 #include "config.h"
 #include "dataview-uniq.h"
-#include "lely/co/type.h"
+#include "debug.h"
 #include "master_dev.h"
 
-#define CANOPEN_DEBUG
-
-#ifdef CANOPEN_DEBUG
-#include <stdio.h>
-#define DEBUG_PRINT(...) printf(__VA_ARGS__)
-#else
-#define DEBUG_PRINT(...) ((void)0)
+#ifndef CANOPEN_MEMORY_POOL_SIZE
+// 10kB by default, should be enough for demo
+#define CANOPEN_MEMORY_POOL_SIZE (10 * 1024)
 #endif
 
-#define MEMORY_POOL_SIZE (10 * 1024 * 1024)
-
-static char memory[MEMORY_POOL_SIZE] __attribute__((aligned)) = {0};
+static char memory[CANOPEN_MEMORY_POOL_SIZE] __attribute__((aligned)) = {0};
 static struct mempool memory_pool;
 static can_net_t *net = NULL;
 static co_dev_t *dev = NULL;
@@ -46,6 +41,10 @@ static alloc_t *allocator_init(void) {
   alloc_t *const alloc = mempool_init(&memory_pool, memory, sizeof(memory));
   assert(alloc);
   return alloc;
+}
+
+static inline struct timespec convert_asn_time_to_timespec(asn1SccTime time) {
+  return (struct timespec){.tv_sec = time.seconds, .tv_nsec = time.nanoseconds};
 }
 
 static struct timespec get_current_time() {
