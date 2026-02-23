@@ -11,6 +11,8 @@ SPACECREATOR?=spacecreator.AppImage
 #
 # NOTE: this can also be done in the Deployment View directly
 
+export DEMO_USER_CFLAGS=-DCANOPEN_DEBUG
+
 # If you need to reset this Makefile to its original state, run:
 # $ taste reset
 
@@ -45,6 +47,19 @@ coverage: work/glue_coverage
 	$(MAKE) -C work check_targets
 	$(MAKE) -C work
 
+canopen-demo: debug
+# Both the CANopen logs and CAN traffic will appear on the standard output
+	candump vcan0 &
+	./work/binaries/demo &
+# Wait until the node automatically shuts down
+	@sleep 6
+# Send a "reset all nodes" frame to the node
+	cansend vcan0 000#8200
+# You should see the node restart in the log
+	@sleep 2
+	@-pkill demo
+	@-pkill candump
+
 # To build and run the system type e.g. 'make debug run'
 run:
 	$(MAKE) -C work run
@@ -54,7 +69,7 @@ edit_cv:
 	$(MAKE) -C work run_cv
 
 # Simulation target (experimental - for systems made of SDL functions only)
-simu:	
+simu:
 	if [ -f work/glue_debug ] || [ -f work/glue_release ] || [ -f work/glue_coverage ]; then $(MAKE) clean; fi
 	$(MAKE) interfaceview work/glue_simu
 	$(MAKE) -C work
