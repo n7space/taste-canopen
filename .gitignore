@@ -79,5 +79,7 @@ taste.pro
 **/work/time_provider/C/src/time_provider.h
 **/work/vcan/C/src/vcan.h
 
-.qtc_clangd
+**/.qtc_clangd
 *.pro.user
+**/.cache
+compile_commands.json
