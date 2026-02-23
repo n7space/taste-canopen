@@ -21,18 +21,15 @@
 #include "canopen_utils.h"
 #include "config.h"
 #include "dataview-uniq.h"
+#include "debug.h"
 #include "master_dev.h"
 
-#ifdef CANOPEN_DEBUG
-#include <stdio.h>
-#define DEBUG_PRINT(...) printf(__VA_ARGS__)
-#else
-#define DEBUG_PRINT(...) ((void)0)
+#ifndef CANOPEN_MEMORY_POOL_SIZE
+// 30kB by default, increase via Makefile if the node fails initialization
+#define CANOPEN_MEMORY_POOL_SIZE (30 * 1024)
 #endif
 
-#define MEMORY_POOL_SIZE (10 * 1024 * 1024)
-
-static char memory[MEMORY_POOL_SIZE] __attribute__((aligned)) = {0};
+static char memory[CANOPEN_MEMORY_POOL_SIZE] __attribute__((aligned)) = {0};
 static struct mempool memory_pool;
 static can_net_t *net = NULL;
 static co_dev_t *dev = NULL;
@@ -44,6 +41,10 @@ static alloc_t *allocator_init(void) {
   alloc_t *const alloc = mempool_init(&memory_pool, memory, sizeof(memory));
   assert(alloc);
   return alloc;
+}
+
+static inline struct timespec convert_asn_time_to_timespec(asn1SccTime time) {
+  return (struct timespec){.tv_sec = time.seconds, .tv_nsec = time.nanoseconds};
 }
 
 static struct timespec get_current_time() {
@@ -92,8 +93,9 @@ static int send_callback(const struct can_msg *const msg, uint_least8_t busId,
     frame.id.u.standard_id = msg->id & CAN_MASK_BID;
   }
 
-  // Convert data
-  frame.data.nCount = (msg->len > 8) ? 8 : msg->len;
+  // Copy the data
+  assert(msg->len <= 8 && "Error: frame cannot be longer than 8 bytes!");
+  frame.data.nCount = msg->len;
   for (int i = 0; i < frame.data.nCount; i++) {
     frame.data.arr[i] = msg->data[i];
   }
@@ -123,8 +125,10 @@ void canopen_PI_receive_data(const asn1SccCan_Frame *frame_data) {
     frame.id = frame_data->id.u.standard_id & CAN_MASK_BID;
   }
 
-  // Convert data
-  frame.len = (frame_data->data.nCount > 8) ? 8 : frame_data->data.nCount;
+  // Copy the data
+  assert(frame_data->data.nCount <= 8 &&
+         "Error: frame cannot be longer than 8 bytes!");
+  frame.len = frame_data->data.nCount;
   for (int i = 0; i < frame.len; i++) {
     frame.data[i] = frame_data->data.arr[i];
   }
@@ -187,14 +191,13 @@ static void nmt_sync_indicator(co_sync_t *sync_in, co_unsigned8_t cnt,
   canopen_RI_nmt_sync_indicator(&asnCounter);
 }
 
-void canopen_startup(void) {
-  // Startup left empty, initialization implemented in canopen_PI_init
-}
+void canopen_startup(void) {}
 
-void canopen_PI_init(void) {
+void canopen_PI_init(asn1SccCANopen_Init_Result *result) {
   if (net != NULL) {
     // Already initialized
     DEBUG_PRINT("[CANopen] Already initialized, ignoring init...\n");
+    *result = asn1SccCANopen_Init_Result_already_initialized;
     return;
   }
 
@@ -204,27 +207,33 @@ void canopen_PI_init(void) {
   dev = master_dev_init();
   if (dev == NULL) {
     DEBUG_PRINT("[CANopen] ERROR: Failed to initialize device\n");
+    *result = asn1SccCANopen_Init_Result_device_creation_failure;
     return;
   }
 
   // Create CAN network
   net = can_net_create(allocator_init(), 0);
   if (net == NULL) {
-    DEBUG_PRINT("[CANopen] ERROR: Failed to create CAN network\n");
+    DEBUG_PRINT("[CANopen] ERROR: Failed to create CAN network, check memory "
+                "pool size!\n");
+    *result = asn1SccCANopen_Init_Result_network_creation_failure;
     return;
   }
 
   // Create NMT service
   nmt = co_nmt_create(net, dev);
   if (nmt == NULL) {
-    DEBUG_PRINT("[CANopen] ERROR: Failed to create NMT service\n");
+    DEBUG_PRINT("[CANopen] ERROR: Failed to create NMT service, check memory "
+                "pool size!\n");
+    *result = asn1SccCANopen_Init_Result_nmt_creation_failure;
     return;
   }
 
   sync = co_nmt_get_sync(nmt);
   if (sync == NULL) {
-    DEBUG_PRINT(
-        "[CANopen] ERROR: NMT service manager failed to create SYNC service\n");
+    DEBUG_PRINT("[CANopen] ERROR: NMT service manager failed to create SYNC "
+                "service, check memory pool size!\n");
+    *result = asn1SccCANopen_Init_Result_sync_creation_failure;
     return;
   }
 
@@ -238,6 +247,7 @@ void canopen_PI_init(void) {
   startupTime = get_current_time();
 
   DEBUG_PRINT("[CANopen] Initialization complete\n");
+  *result = asn1SccCANopen_Init_Result_success;
 }
 
 void canopen_PI_canopen_network_tick(void) {
@@ -248,13 +258,13 @@ void canopen_PI_canopen_network_tick(void) {
   struct timespec currentTime = get_time_from_startup();
   can_net_set_time(net, &currentTime);
 
-  // TODO: this is debug log, probably kill
+#ifdef CANOPEN_DEBUG
   static uint32_t counter = 0;
   if (counter % 100 == 0)
     DEBUG_PRINT("[CANopen] Current network time: %lds, %ldns\n",
                 currentTime.tv_sec, currentTime.tv_nsec);
-
   counter++;
+#endif
 }
 
 void canopen_PI_change_node_state(const asn1SccCANopen_NMT_State *state) {
@@ -263,32 +273,7 @@ void canopen_PI_change_node_state(const asn1SccCANopen_NMT_State *state) {
   }
 
   // Map ASN.1 NMT state to Lely CANopen NMT command specifier
-  co_unsigned8_t cs;
-  switch (*state) {
-  case asn1SccCANopen_NMT_State_start:
-    cs = CO_NMT_CS_START;
-    break;
-  case asn1SccCANopen_NMT_State_stop:
-    cs = CO_NMT_CS_STOP;
-    break;
-  case asn1SccCANopen_NMT_State_preop:
-    cs = CO_NMT_CS_ENTER_PREOP;
-    break;
-  case asn1SccCANopen_NMT_State_reset_node:
-    cs = CO_NMT_CS_RESET_NODE;
-    break;
-  case asn1SccCANopen_NMT_State_reset_comm:
-    cs = CO_NMT_CS_RESET_COMM;
-    break;
-  case asn1SccCANopen_NMT_State_bootup:
-    // Bootup is not a command that can be issued externally
-    DEBUG_PRINT("[CANopen] Warning: Cannot transition to bootup state via "
-                "command\n");
-    return;
-  default:
-    DEBUG_PRINT("[CANopen] Error: Unknown NMT state: %d\n", *state);
-    return;
-  }
+  const co_unsigned8_t cs = map_asn_nmt_state_to_command(*state);
 
   // Issue the NMT command
   DEBUG_PRINT("[CANopen] Changing network state to: %d (command: 0x%02X)\n",
@@ -303,6 +288,7 @@ void canopen_PI_change_node_state(const asn1SccCANopen_NMT_State *state) {
 
 void canopen_PI_reset_node(void) {
   if (nmt == NULL) {
+    DEBUG_PRINT("[CANopen] NMT is not initialized, cannot reset node!");
     return;
   }
 
@@ -321,7 +307,8 @@ void canopen_PI_issue_slave_command(
               map_nmt_command_to_string(command), nodeId);
 
   if (co_nmt_cs_req(nmt, command, nodeId) != 0) {
-    DEBUG_PRINT("[CANopen] NMT command request %X (%s) to node %X failed!\n",
+    DEBUG_PRINT("[CANopen] NMT command request %X (%s) to node %X failed (is "
+                "target node on the network?)!\n",
                 command, map_nmt_command_to_string(command), nodeId);
   }
 }
@@ -329,14 +316,17 @@ void canopen_PI_issue_slave_command(
 void canopen_PI_set_object_dictionary_data(
     const asn1SccCANopen_Object_Index *index,
     const asn1SccCANopen_Subobject_Index *subindex,
-    const asn1SccCANopen_Value *value) {
-  if (dev == NULL || index == NULL || subindex == NULL || value == NULL) {
+    const asn1SccCANopen_Value *value,
+    asn1SccCANopen_ObjDict_Operation_Result *result) {
+  if (dev == NULL) {
+    *result = asn1SccCANopen_ObjDict_Operation_Result_device_not_initialized;
     return;
   }
 
   co_obj_t *obj = co_dev_find_obj(dev, (co_unsigned16_t)(*index));
   if (obj == NULL) {
     DEBUG_PRINT("[CANopen] ERROR: Object %04lX not found\n", *index);
+    *result = asn1SccCANopen_ObjDict_Operation_Result_invalid_index;
     return;
   }
 
@@ -344,14 +334,15 @@ void canopen_PI_set_object_dictionary_data(
   if (sub == NULL) {
     DEBUG_PRINT("[CANopen] ERROR: Sub-object %04lX:%02lX not found\n", *index,
                 *subindex);
+    *result = asn1SccCANopen_ObjDict_Operation_Result_invalid_subindex;
     return;
   }
 
   // Write value based on the choice type
   size_t bytes_written = 0;
   switch (value->kind) {
-  case CANopen_Value_boolean_d_PRESENT:
-    bytes_written = co_sub_set_val_b(sub, value->u.boolean_d);
+  case CANopen_Value_boolean8_PRESENT:
+    bytes_written = co_sub_set_val_b(sub, value->u.boolean8);
     break;
   case CANopen_Value_unsigned8_PRESENT:
     bytes_written = co_sub_set_val_u8(sub, (co_unsigned8_t)value->u.unsigned8);
@@ -386,30 +377,37 @@ void canopen_PI_set_object_dictionary_data(
   default:
     DEBUG_PRINT("[CANopen] ERROR: Unsupported value type 0x%04X\n",
                 value->kind);
+    *result = asn1SccCANopen_ObjDict_Operation_Result_unsupported_type;
     return;
   }
 
   if (bytes_written == 0) {
     DEBUG_PRINT("[CANopen] ERROR: Failed to write value to OD %04lX:%02lX\n",
                 *index, *subindex);
+    *result = asn1SccCANopen_ObjDict_Operation_Result_write_failed;
     return;
   }
 
   DEBUG_PRINT("[CANopen] Set OD %04lX:%02lX successful (%zu bytes written)\n",
               *index, *subindex, bytes_written);
+  *result = asn1SccCANopen_ObjDict_Operation_Result_success;
 }
 
 void canopen_PI_get_object_dictionary_data(
     const asn1SccCANopen_Object_Index *index,
-    const asn1SccCANopen_Subobject_Index *subindex,
-    asn1SccCANopen_Value *value) {
-  if (dev == NULL || index == NULL || subindex == NULL || value == NULL) {
+    const asn1SccCANopen_Subobject_Index *subindex, asn1SccCANopen_Value *value,
+    asn1SccCANopen_ObjDict_Operation_Result *result) {
+  if (dev == NULL) {
+    DEBUG_PRINT("[CANopen] ERROR: cannot get object dictionary value, device "
+                "not initialized\n");
+    *result = asn1SccCANopen_ObjDict_Operation_Result_device_not_initialized;
     return;
   }
 
   co_obj_t *obj = co_dev_find_obj(dev, (co_unsigned16_t)(*index));
   if (obj == NULL) {
     DEBUG_PRINT("[CANopen] ERROR: Object %04lX not found\n", *index);
+    *result = asn1SccCANopen_ObjDict_Operation_Result_invalid_index;
     return;
   }
 
@@ -417,6 +415,7 @@ void canopen_PI_get_object_dictionary_data(
   if (sub == NULL) {
     DEBUG_PRINT("[CANopen] ERROR: Sub-object %04lX:%02lX not found\n", *index,
                 *subindex);
+    *result = asn1SccCANopen_ObjDict_Operation_Result_invalid_subindex;
     return;
   }
 
@@ -425,8 +424,8 @@ void canopen_PI_get_object_dictionary_data(
 
   switch (type) {
   case CO_DEFTYPE_BOOLEAN:
-    value->kind = CANopen_Value_boolean_d_PRESENT;
-    value->u.boolean_d = (co_sub_get_val_b(sub));
+    value->kind = CANopen_Value_boolean8_PRESENT;
+    value->u.boolean8 = (co_sub_get_val_b(sub));
     break;
   case CO_DEFTYPE_UNSIGNED8:
     value->kind = CANopen_Value_unsigned8_PRESENT;
@@ -465,9 +464,11 @@ void canopen_PI_get_object_dictionary_data(
     value->u.real32 = co_sub_get_val_r32(sub);
     break;
   default:
+    *result = asn1SccCANopen_ObjDict_Operation_Result_unsupported_type;
     DEBUG_PRINT("[CANopen] ERROR: Unsupported value type 0x%04X\n", type);
     break;
   }
 
   DEBUG_PRINT("[CANopen] Get OD %04lX:%02lX successful\n", *index, *subindex);
+  *result = asn1SccCANopen_ObjDict_Operation_Result_success;
 }

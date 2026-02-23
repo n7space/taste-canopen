@@ -23,10 +23,10 @@ void canopen_PI_canopen_network_tick( void );
 void canopen_PI_change_node_state( const asn1SccCANopen_NMT_State * );
 
 
-void canopen_PI_get_object_dictionary_data( const asn1SccCANopen_Object_Index *, const asn1SccCANopen_Subobject_Index *, asn1SccCANopen_Value * );
+void canopen_PI_get_object_dictionary_data( const asn1SccCANopen_Object_Index *, const asn1SccCANopen_Subobject_Index *, asn1SccCANopen_Value *, asn1SccCANopen_ObjDict_Operation_Result * );
 
 
-void canopen_PI_init( void );
+void canopen_PI_init( asn1SccCANopen_Init_Result * );
 
 
 void canopen_PI_issue_slave_command( const asn1SccCANopen_NodeID *, const asn1SccCANopen_NMT_Command * );
@@ -38,7 +38,7 @@ void canopen_PI_receive_data( const asn1SccCan_Frame * );
 void canopen_PI_reset_node( void );
 
 
-void canopen_PI_set_object_dictionary_data( const asn1SccCANopen_Object_Index *, const asn1SccCANopen_Subobject_Index *, const asn1SccCANopen_Value * );
+void canopen_PI_set_object_dictionary_data( const asn1SccCANopen_Object_Index *, const asn1SccCANopen_Subobject_Index *, const asn1SccCANopen_Value *, asn1SccCANopen_ObjDict_Operation_Result * );
 
 /* Required interfaces */
 extern void canopen_RI_get_elapsed_time( asn1SccTime * );
