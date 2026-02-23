@@ -78,28 +78,6 @@ Time ::= SEQUENCE {
 
 -- Helper types
 
-Get-Data-Request ::= SEQUENCE {
-   object CANopen-Object-Index,
-   subobject CANopen-Subobject-Index
-}
-
-Get-Data-Response ::= SEQUENCE {
-   object CANopen-Object-Index,
-   subobject CANopen-Subobject-Index,
-   data-value CANopen-Value
-}
-
-Set-Data-Request ::= SEQUENCE {
-   object CANopen-Object-Index,
-   subobject CANopen-Subobject-Index,
-   data-value CANopen-Value
-}
-
-Node-Command-Request ::= SEQUENCE {
-   node-id CANopen-NodeID,
-   command CANopen-NMT-Command
-}
-
 CANopen-Init-Result ::= ENUMERATED {
    success,
    already-initialized,
@@ -116,6 +94,40 @@ CANopen-ObjDict-Operation-Result ::= ENUMERATED {
    invalid-subindex,
    unsupported-type,
    write-failed
+}
+
+CANopen-Slave-Command ::= SEQUENCE {
+   node-id CANopen-NodeID,
+   command CANopen-NMT-Command
+}
+
+CANopen-Slave-Command-Result ::= SEQUENCE {
+   node-id CANopen-NodeID,
+   command CANopen-NMT-Command,
+   success BOOLEAN
+}
+
+Get-Data-Request ::= SEQUENCE {
+   object CANopen-Object-Index,
+   subobject CANopen-Subobject-Index
+}
+
+Get-Data-Response ::= SEQUENCE {
+   object CANopen-Object-Index,
+   subobject CANopen-Subobject-Index,
+   data-value CANopen-Value,
+   result CANopen-ObjDict-Operation-Result
+}
+
+Set-Data-Request ::= SEQUENCE {
+   object CANopen-Object-Index,
+   subobject CANopen-Subobject-Index,
+   data-value CANopen-Value
+}
+
+Node-Command-Request ::= SEQUENCE {
+   node-id CANopen-NodeID,
+   command CANopen-NMT-Command
 }
 
 END

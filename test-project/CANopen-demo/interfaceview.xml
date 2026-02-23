@@ -41,7 +41,7 @@
 </Required_Interface>
 
 <Required_Interface id="{750cdf2f-2461-486b-a6c5-65da997327df}" name="objdict_get_result" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" miat="0" priority="1" queue_size="1" stack_size="1024">
-    <Input_Parameter name="response" type="Get-Data-Response" encoding="NATIVE"/>
+    <Input_Parameter name="result" type="Get-Data-Response" encoding="NATIVE"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
@@ -67,6 +67,25 @@
 <Required_Interface id="{83e45b5a-098b-4074-924a-5f566b35e4f2}" name="issue_slave_command" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
     <Input_Parameter name="nodeid" type="CANopen-NodeID" encoding="NATIVE"/>
     <Input_Parameter name="cmd" type="CANopen-NMT-Command" encoding="NATIVE"/>
+    <Output_Parameter name="success" type="T-Boolean" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{00eaabac-b4d3-4d26-8d37-b6112cf23380}" name="objdict_set_result" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" miat="0" priority="1" queue_size="1" stack_size="1024">
+    <Input_Parameter name="result" type="CANopen-ObjDict-Operation-Result" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="false"/>
+</Required_Interface>
+
+<Required_Interface id="{049e6f27-0d98-49fe-b0d3-9c1317b39cbc}" name="slave_command_result" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" miat="0" priority="1" queue_size="1" stack_size="1024">
+    <Input_Parameter name="result" type="CANopen-Slave-Command-Result" encoding="NATIVE"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface id="{4a0f215e-c460-4a7f-9ce1-6177ab5ed8eb}" name="init_result" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" miat="0" priority="1" queue_size="1" stack_size="1024">
+    <Input_Parameter name="result" type="CANopen-Init-Result" encoding="NATIVE"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="true"/>
 </Required_Interface>
@@ -119,7 +138,19 @@
 </Provided_Interface>
 
 <Provided_Interface id="{c06d5035-e6e9-432a-936f-eb36f1880e90}" name="objdict_get_result" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" miat="0" priority="1" queue_size="1" stack_size="1024">
-    <Input_Parameter name="response" type="Get-Data-Response" encoding="NATIVE"/>
+    <Input_Parameter name="result" type="Get-Data-Response" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{01a5c341-89f1-4a6c-8388-641221c86fce}" name="objdict_set_result" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" miat="0" priority="1" queue_size="1" stack_size="1024">
+    <Input_Parameter name="result" type="CANopen-ObjDict-Operation-Result" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{29f7edb7-e655-4826-94b6-1df6e50a26a2}" name="slave_command_result" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" miat="0" priority="1" queue_size="1" stack_size="1024">
+    <Input_Parameter name="result" type="CANopen-Slave-Command-Result" encoding="NATIVE"/>
+</Provided_Interface>
+
+<Provided_Interface id="{7e6c6a9a-e7a4-4bbb-a23e-02ca730fb6be}" name="init_result" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" miat="0" priority="1" queue_size="1" stack_size="1024">
+    <Input_Parameter name="result" type="CANopen-Init-Result" encoding="NATIVE"/>
 </Provided_Interface>
 
 <Required_Interface id="{7abbaad3-6611-4848-8f80-e3790e6f5fe1}" name="do_init" kind="Sporadic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" miat="0" priority="1" queue_size="1" stack_size="1024">
@@ -198,6 +229,7 @@
 <Provided_Interface id="{c605c9cd-f108-47c8-8792-e145c7683ed5}" name="issue_slave_command" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
     <Input_Parameter name="nodeid" type="CANopen-NodeID" encoding="NATIVE"/>
     <Input_Parameter name="cmd" type="CANopen-NMT-Command" encoding="NATIVE"/>
+    <Output_Parameter name="success" type="T-Boolean" encoding="NATIVE"/>
 </Provided_Interface>
 
 <Required_Interface id="{4b24bd1c-a17b-4776-86be-1f1cd420af2d}" name="get_elapsed_time" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" is_alarm="false" wcet="0" is_observable="false">
@@ -316,6 +348,11 @@
     <Target iface_id="{93898e20-7e1d-458a-901d-b3aea95980d8}" func_name="CANopen" pi_name="init" />
 </Connection>
 
+<Connection id="{b43747fb-4dc6-486f-bcb3-0159a29d0ebd}" name="helper_init_result____control_init_result" required_system_element="NO">
+    <Source iface_id="{4a0f215e-c460-4a7f-9ce1-6177ab5ed8eb}" func_name="helper" ri_name="init_result" />
+    <Target iface_id="{7e6c6a9a-e7a4-4bbb-a23e-02ca730fb6be}" func_name="control" pi_name="init_result" />
+</Connection>
+
 <Connection id="{afae6fcb-b821-4a08-99b9-b390643e6eb2}" required_system_element="NO">
     <Source iface_id="{4b24bd1c-a17b-4776-86be-1f1cd420af2d}" func_name="CANopen" ri_name="get_elapsed_time" />
     <Target iface_id="{57d3d8ac-fcd7-4f92-9b68-4e46f1472a2d}" func_name="time_provider" pi_name="get_elapsed_time" />
@@ -326,9 +363,19 @@
     <Target iface_id="{c06d5035-e6e9-432a-936f-eb36f1880e90}" func_name="control" pi_name="objdict_get_result" />
 </Connection>
 
+<Connection id="{b4d2d7c8-fd2d-48c7-8797-e93e91969623}" name="helper_objdict_set_result____control_objdict_set_result" required_system_element="NO">
+    <Source iface_id="{00eaabac-b4d3-4d26-8d37-b6112cf23380}" func_name="helper" ri_name="objdict_set_result" />
+    <Target iface_id="{01a5c341-89f1-4a6c-8388-641221c86fce}" func_name="control" pi_name="objdict_set_result" />
+</Connection>
+
 <Connection id="{bb7e1784-5936-4aa3-9fab-fc73b5e6a132}" name="CANopen_nmt_heartbeat_indicator____tester_nmt_heartbeat_indicator" required_system_element="NO">
     <Source iface_id="{94c5fdb5-70df-480a-af2f-4390b3273665}" func_name="CANopen" ri_name="nmt_heartbeat_indicator" />
     <Target iface_id="{22a87131-7212-4e03-998f-f28b8fcca5e6}" func_name="tester" pi_name="nmt_heartbeat_indicator" />
+</Connection>
+
+<Connection id="{7780d5c7-ee8a-4827-897c-443bb11cea86}" name="helper_slave_command_result____control_slave_command_result" required_system_element="NO">
+    <Source iface_id="{049e6f27-0d98-49fe-b0d3-9c1317b39cbc}" func_name="helper" ri_name="slave_command_result" />
+    <Target iface_id="{29f7edb7-e655-4826-94b6-1df6e50a26a2}" func_name="control" pi_name="slave_command_result" />
 </Connection>
 
 <Connection id="{212f1cc8-02e9-4479-a915-10ed21e5c123}" name="helper_reset_node____CANopen_reset_node" required_system_element="NO">

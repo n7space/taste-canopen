@@ -299,16 +299,20 @@ void canopen_PI_reset_node(void) {
 
 void canopen_PI_issue_slave_command(
     const asn1SccCANopen_NodeID *asnNodeId,
-    const asn1SccCANopen_NMT_Command *asnCommand) {
+    const asn1SccCANopen_NMT_Command *asnCommand, asn1SccT_Boolean *result) {
 
   co_unsigned8_t nodeId = *asnNodeId;
   co_unsigned8_t command = map_nmt_command_from_asn(*asnCommand);
   DEBUG_PRINT("[CANopen] Issuing command %X (%s) to node %X\n", command,
               map_nmt_command_to_string(command), nodeId);
 
-  if (co_nmt_cs_req(nmt, command, nodeId) != 0) {
-    DEBUG_PRINT("[CANopen] NMT command request %X (%s) to node %X failed (is "
-                "target node on the network?)!\n",
+  *result = co_nmt_cs_req(nmt, command, nodeId) == 0;
+  if (*result) {
+    DEBUG_PRINT("[CANopen] NMT command request %X (%s) to node %X succeeded!\n",
+                command, map_nmt_command_to_string(command), nodeId);
+  } else {
+    DEBUG_PRINT("[CANopen] NMT command request %X (%s) to node %X failed! (is "
+                "target node on the network?)\n",
                 command, map_nmt_command_to_string(command), nodeId);
   }
 }

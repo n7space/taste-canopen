@@ -52,11 +52,11 @@ canopen-demo: debug
 	candump vcan0 &
 	./work/binaries/demo &
 # Wait until the node automatically shuts down
-	@sleep 6
+	@sleep 7
 # Send a "reset all nodes" frame to the node
 	cansend vcan0 000#8200
 # You should see the node restart in the log
-	@sleep 2
+	@sleep 5
 	@-pkill demo
 	@-pkill candump
 
