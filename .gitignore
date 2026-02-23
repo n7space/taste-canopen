@@ -56,3 +56,28 @@ dkms.conf
 
 # Do not ignore .modelcheck files
 !*.modelcheck
+
+# TASTE files
+**/work/Dump
+**/work/build
+**/work/Debug
+**/C/wrappers
+glue_*
+skeletons_built
+*.aadl
+taste.pro
+**/work/**/*.pro
+**/work/**/Makefile
+**/work/dataview
+**/work/binaries
+
+**/work/canopen/C/src/canopen.h
+**/work/canopen/C/src/master_dev.h
+**/work/control/C/src/control.h
+**/work/helper/C/src/helper.h
+**/work/tester/C/src/tester.h
+**/work/time_provider/C/src/time_provider.h
+**/work/vcan/C/src/vcan.h
+
+.qtc_clangd
+*.pro.user
