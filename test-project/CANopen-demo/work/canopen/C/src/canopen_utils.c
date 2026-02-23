@@ -166,3 +166,24 @@ const char *map_nmt_ec_reason_to_string(co_nmt_ec_reason_t reason) {
     return "UNKNOWN";
   }
 }
+
+co_unsigned8_t map_asn_nmt_state_to_command(asn1SccCANopen_NMT_State) {
+  switch (*state) {
+  case asn1SccCANopen_NMT_State_start:
+  case asn1SccCANopen_NMT_State_bootup:
+    return CO_NMT_CS_START;
+  case asn1SccCANopen_NMT_State_stop:
+    return CO_NMT_CS_STOP;
+  case asn1SccCANopen_NMT_State_preop:
+    return CO_NMT_CS_ENTER_PREOP;
+  case asn1SccCANopen_NMT_State_reset_node:
+    return CO_NMT_CS_RESET_NODE;
+  case asn1SccCANopen_NMT_State_reset_comm:
+    return CO_NMT_CS_RESET_COMM;
+  default:
+    DEBUG_PRINT(
+        "[CANopen] Error: Unknown NMT state: %d, falling back to START\n",
+        *state);
+    return CO_NMT_CS_START;
+  }
+}

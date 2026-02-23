@@ -133,9 +133,9 @@ void canopen_PI_receive_data(const asn1SccCan_Frame *frame_data) {
   can_net_recv(net, &frame, 0);
 }
 
-static void nmt_command_indicator(co_nmt_t *nmt_, co_unsigned8_t cs,
+static void nmt_command_indicator(co_nmt_t *nmt_in, co_unsigned8_t cs,
                                   void *data) {
-  assert(nmt_ == nmt);
+  assert(nmt_in == nmt);
   (void)data;
 
   DEBUG_PRINT(
@@ -146,9 +146,9 @@ static void nmt_command_indicator(co_nmt_t *nmt_, co_unsigned8_t cs,
   canopen_RI_nmt_command_indicator(&asnCs);
 }
 
-static void nmt_state_indicator(co_nmt_t *nmt_, co_unsigned8_t id,
+static void nmt_state_indicator(co_nmt_t *nmt_in, co_unsigned8_t id,
                                 co_unsigned8_t st, void *data) {
-  assert(nmt_ == nmt);
+  assert(nmt_in == nmt);
   (void)data;
   DEBUG_PRINT(
       "[CANopen] NMT state indicator triggered; ID: %X, state: %X (%s)\n", id,
@@ -159,10 +159,10 @@ static void nmt_state_indicator(co_nmt_t *nmt_, co_unsigned8_t id,
   canopen_RI_nmt_state_indicator(&asnId, &asnSt);
 }
 
-static void nmt_hearbeat_indicator(co_nmt_t *nmt_, co_unsigned8_t id,
+static void nmt_hearbeat_indicator(co_nmt_t *nmt_in, co_unsigned8_t id,
                                    co_nmt_ec_state_t state_,
                                    co_nmt_ec_reason_t reason, void *data) {
-  assert(nmt_ == nmt);
+  assert(nmt_in == nmt);
   (void)data;
   DEBUG_PRINT(
       "[CANopen] NMT heartbeat received from node %02X, state: %X (%s), "
@@ -178,9 +178,9 @@ static void nmt_hearbeat_indicator(co_nmt_t *nmt_, co_unsigned8_t id,
   canopen_RI_nmt_heartbeat_indicator(&asnNodeId, &asnHbState, &asnHbReason);
 }
 
-static void nmt_sync_indicator(co_sync_t *sync_, co_unsigned8_t cnt,
+static void nmt_sync_indicator(co_sync_t *sync_in, co_unsigned8_t cnt,
                                void *data) {
-  assert(sync_ == sync);
+  assert(sync_in == sync);
   (void)data;
   DEBUG_PRINT("[CANopen] NMT sync received, counter: %X\n", cnt);
 
@@ -211,21 +211,23 @@ void canopen_PI_init(void) {
   // Create CAN network
   net = can_net_create(allocator_init(), 0);
   if (net == NULL) {
-    DEBUG_PRINT("[CANopen] ERROR: Failed to create CAN network\n");
+    DEBUG_PRINT("[CANopen] ERROR: Failed to create CAN network, check memory "
+                "pool size!\n");
     return;
   }
 
   // Create NMT service
   nmt = co_nmt_create(net, dev);
   if (nmt == NULL) {
-    DEBUG_PRINT("[CANopen] ERROR: Failed to create NMT service\n");
+    DEBUG_PRINT("[CANopen] ERROR: Failed to create NMT service, check memory "
+                "pool size!\n");
     return;
   }
 
   sync = co_nmt_get_sync(nmt);
   if (sync == NULL) {
-    DEBUG_PRINT(
-        "[CANopen] ERROR: NMT service manager failed to create SYNC service\n");
+    DEBUG_PRINT("[CANopen] ERROR: NMT service manager failed to create SYNC "
+                "service, check memory pool size!\n");
     return;
   }
 
@@ -264,32 +266,7 @@ void canopen_PI_change_node_state(const asn1SccCANopen_NMT_State *state) {
   }
 
   // Map ASN.1 NMT state to Lely CANopen NMT command specifier
-  co_unsigned8_t cs;
-  switch (*state) {
-  case asn1SccCANopen_NMT_State_start:
-    cs = CO_NMT_CS_START;
-    break;
-  case asn1SccCANopen_NMT_State_stop:
-    cs = CO_NMT_CS_STOP;
-    break;
-  case asn1SccCANopen_NMT_State_preop:
-    cs = CO_NMT_CS_ENTER_PREOP;
-    break;
-  case asn1SccCANopen_NMT_State_reset_node:
-    cs = CO_NMT_CS_RESET_NODE;
-    break;
-  case asn1SccCANopen_NMT_State_reset_comm:
-    cs = CO_NMT_CS_RESET_COMM;
-    break;
-  case asn1SccCANopen_NMT_State_bootup:
-    // Bootup is not a command that can be issued externally
-    DEBUG_PRINT("[CANopen] Warning: Cannot transition to bootup state via "
-                "command\n");
-    return;
-  default:
-    DEBUG_PRINT("[CANopen] Error: Unknown NMT state: %d\n", *state);
-    return;
-  }
+  const co_unsigned8_t cs = map_asn_nmt_state_to_command(*state);
 
   // Issue the NMT command
   DEBUG_PRINT("[CANopen] Changing network state to: %d (command: 0x%02X)\n",
@@ -304,6 +281,7 @@ void canopen_PI_change_node_state(const asn1SccCANopen_NMT_State *state) {
 
 void canopen_PI_reset_node(void) {
   if (nmt == NULL) {
+    DEBUG_PRINT("[CANopen] NMT is not initialized, cannot reset node!");
     return;
   }
 

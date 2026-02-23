@@ -132,9 +132,9 @@ void canopen_PI_receive_data(const asn1SccCan_Frame *frame_data) {
   can_net_recv(net, &frame, 0);
 }
 
-static void nmt_command_indicator(co_nmt_t *nmt_, co_unsigned8_t cs,
+static void nmt_command_indicator(co_nmt_t *nmt_in, co_unsigned8_t cs,
                                   void *data) {
-  assert(nmt_ == nmt);
+  assert(nmt_in == nmt);
   (void)data;
 
   DEBUG_PRINT(
@@ -145,9 +145,9 @@ static void nmt_command_indicator(co_nmt_t *nmt_, co_unsigned8_t cs,
   canopen_RI_nmt_command_indicator(&asnCs);
 }
 
-static void nmt_state_indicator(co_nmt_t *nmt_, co_unsigned8_t id,
+static void nmt_state_indicator(co_nmt_t *nmt_in, co_unsigned8_t id,
                                 co_unsigned8_t st, void *data) {
-  assert(nmt_ == nmt);
+  assert(nmt_in == nmt);
   (void)data;
   DEBUG_PRINT(
       "[CANopen] NMT state indicator triggered; ID: %X, state: %X (%s)\n", id,
@@ -158,10 +158,10 @@ static void nmt_state_indicator(co_nmt_t *nmt_, co_unsigned8_t id,
   canopen_RI_nmt_state_indicator(&asnId, &asnSt);
 }
 
-static void nmt_hearbeat_indicator(co_nmt_t *nmt_, co_unsigned8_t id,
+static void nmt_hearbeat_indicator(co_nmt_t *nmt_in, co_unsigned8_t id,
                                    co_nmt_ec_state_t state_,
                                    co_nmt_ec_reason_t reason, void *data) {
-  assert(nmt_ == nmt);
+  assert(nmt_in == nmt);
   (void)data;
   DEBUG_PRINT(
       "[CANopen] NMT heartbeat received from node %02X, state: %X (%s), "
@@ -177,9 +177,9 @@ static void nmt_hearbeat_indicator(co_nmt_t *nmt_, co_unsigned8_t id,
   canopen_RI_nmt_heartbeat_indicator(&asnNodeId, &asnHbState, &asnHbReason);
 }
 
-static void nmt_sync_indicator(co_sync_t *sync_, co_unsigned8_t cnt,
+static void nmt_sync_indicator(co_sync_t *sync_in, co_unsigned8_t cnt,
                                void *data) {
-  assert(sync_ == sync);
+  assert(sync_in == sync);
   (void)data;
   DEBUG_PRINT("[CANopen] NMT sync received, counter: %X\n", cnt);
 
