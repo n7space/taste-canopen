@@ -73,7 +73,7 @@ CANopen-NMT-HeartbeatReason ::= ENUMERATED {
 
 Time ::= SEQUENCE {
    seconds INTEGER(0..4294967295),
-   nanoseconds INTEGER(0..4294967295)
+   nanoseconds INTEGER(0..999999999)
 }
 
 -- Helper types
@@ -98,6 +98,22 @@ Set-Data-Request ::= SEQUENCE {
 Node-Command-Request ::= SEQUENCE {
    node-id CANopen-NodeID,
    command CANopen-NMT-Command
+}
+
+CANopen-Init-Result ::= ENUMERATED {
+   success,
+   already-initialized,
+   network-creation-failure,
+   nmt-creation-failure,
+   sync-creation-failure
+}
+
+CANopen-ObjDict-Operation-Result ::= ENUMERATED {
+   success,
+   invalid-index,
+   invalid-subindex,
+   unsupported-type,
+   write-failed
 }
 
 END
