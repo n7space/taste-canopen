@@ -1,6 +1,7 @@
 #include "vcan.h"
 #include "dataview-uniq.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -47,8 +48,7 @@ static void *recv_thread_main(void *ignored) {
 
       // Copy data
       asn_frame.data.nCount = frame.len;
-      if (frame.len > 8)
-        asn_frame.data.nCount = 8; // Clamp to max size
+      assert(frame.len <= 8 && "Error: Frame cannot be longer than 8 bytes!");
       memcpy(asn_frame.data.arr, frame.data, asn_frame.data.nCount);
 
       // Call the required interface with the converted frame
@@ -125,8 +125,7 @@ void vcan_PI_transmit_data(const asn1SccCan_Frame *IN_frame) {
 
   // Copy data
   frame.len = IN_frame->data.nCount;
-  if (frame.len > 8)
-    frame.len = 8; // Clamp to max CAN data length
+  assert(frame.len <= 8 && "Error: Frame cannot be longer than 8 bytes!");
 
   memcpy(frame.data, IN_frame->data.arr, frame.len);
 
