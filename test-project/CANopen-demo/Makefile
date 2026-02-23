@@ -11,7 +11,7 @@ SPACECREATOR?=spacecreator.AppImage
 #
 # NOTE: this can also be done in the Deployment View directly
 
-export DEMO_USER_CFLAGS=-DCANOPEN_DEBUG
+export DEMO_USER_CFLAGS=-DCANOPEN_DEBUG -DCANOPEN_LINUX
 
 # If you need to reset this Makefile to its original state, run:
 # $ taste reset

@@ -25,6 +25,7 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
+#ifdef CANOPEN_LINUX
 /* Define to 1 if you have the <linux/can/error.h> header file. */
 #define HAVE_LINUX_CAN_ERROR_H 1
 
@@ -39,6 +40,7 @@
 
 /* Define to 1 if you have the <linux/rtnetlink.h> header file. */
 #define HAVE_LINUX_RTNETLINK_H 1
+#endif
 
 /* Define to 1 if you have the <minix/config.h> header file. */
 /* #undef HAVE_MINIX_CONFIG_H */
