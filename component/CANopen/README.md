@@ -32,16 +32,16 @@ The component will automatically (re-)generate `canopen/c/src/master_dev.h` file
 
 This component can be configured by defining following C macros:
 
-- CANOPEN_MEMORY_POOL_SIZE - specifies the size of statically-allocated memory pool for CANopen node. Default value is 30720 bytes, increase if necessary (e.g. initialization of the node fails),
-- CANOPEN_DEBUG - when defined, it will enable `printf`-based debug logs from the component,
-- CANOPEN_LINUX - when defined, it will allow to use SocketCAN, should be defined when running on Linux,
-- CANOPEN_STDIO - when defined, it will allow `lely-core` to use `stdio.h`.
+- `CANOPEN_MEMORY_POOL_SIZE` - specifies the size of statically-allocated memory pool for CANopen node. Default value is 30720 bytes, increase if necessary (e.g. initialization of the node fails),
+- `CANOPEN_DEBUG` - when defined, it will enable `printf`-based debug logs from the component,
+- `CANOPEN_LINUX` - when defined, it will allow to use SocketCAN, should be defined when running on Linux,
+- `CANOPEN_STDIO` - when defined, it will allow `lely-core` to use `stdio.h`.
 
 ## lely-core integration
 
 This component integrates `lely-core` library directly, as the source code, so no external libraries are required.
 
-The code was copied directly from `ecss` branch of [N7 Space lely-core repository](gitlab.com/n7space/canopen/lely-core).
+The code was copied directly from `ecss` branch of [N7 Space lely-core repository](https://gitlab.com/n7space/canopen/lely-core).
 Since the library is typically built using GNU Autotools, it also contains a `config.h` header, generated for ECSS-compatible build.
 
 Some modifications were necessary in order to make this integration work, namely:
