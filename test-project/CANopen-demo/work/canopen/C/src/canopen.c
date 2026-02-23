@@ -93,8 +93,9 @@ static int send_callback(const struct can_msg *const msg, uint_least8_t busId,
     frame.id.u.standard_id = msg->id & CAN_MASK_BID;
   }
 
-  // Convert data
-  frame.data.nCount = (msg->len > 8) ? 8 : msg->len;
+  // Copy the data
+  assert(msg->len <= 8 && "Error: frame cannot be longer than 8 bytes!");
+  frame.data.nCount = msg->len;
   for (int i = 0; i < frame.data.nCount; i++) {
     frame.data.arr[i] = msg->data[i];
   }
@@ -124,8 +125,10 @@ void canopen_PI_receive_data(const asn1SccCan_Frame *frame_data) {
     frame.id = frame_data->id.u.standard_id & CAN_MASK_BID;
   }
 
-  // Convert data
-  frame.len = (frame_data->data.nCount > 8) ? 8 : frame_data->data.nCount;
+  // Copy the data
+  assert(frame_data->data.nCount <= 8 &&
+         "Error: frame cannot be longer than 8 bytes!");
+  frame.len = frame_data->data.nCount;
   for (int i = 0; i < frame.len; i++) {
     frame.data[i] = frame_data->data.arr[i];
   }
