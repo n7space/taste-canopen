@@ -25,8 +25,8 @@
 #include "master_dev.h"
 
 #ifndef CANOPEN_MEMORY_POOL_SIZE
-// 10kB by default, should be enough for demo
-#define CANOPEN_MEMORY_POOL_SIZE (10 * 1024)
+// 30kB by default, increase via Makefile if the node fails initialization
+#define CANOPEN_MEMORY_POOL_SIZE (30 * 1024)
 #endif
 
 static char memory[CANOPEN_MEMORY_POOL_SIZE] __attribute__((aligned)) = {0};
