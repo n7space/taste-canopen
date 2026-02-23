@@ -167,8 +167,8 @@ const char *map_nmt_ec_reason_to_string(co_nmt_ec_reason_t reason) {
   }
 }
 
-co_unsigned8_t map_asn_nmt_state_to_command(asn1SccCANopen_NMT_State) {
-  switch (*state) {
+co_unsigned8_t map_asn_nmt_state_to_command(asn1SccCANopen_NMT_State state) {
+  switch (state) {
   case asn1SccCANopen_NMT_State_start:
   case asn1SccCANopen_NMT_State_bootup:
     return CO_NMT_CS_START;
@@ -183,7 +183,7 @@ co_unsigned8_t map_asn_nmt_state_to_command(asn1SccCANopen_NMT_State) {
   default:
     DEBUG_PRINT(
         "[CANopen] Error: Unknown NMT state: %d, falling back to START\n",
-        *state);
+        state);
     return CO_NMT_CS_START;
   }
 }

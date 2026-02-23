@@ -73,8 +73,8 @@ void control_PI_objdict_get_result(const asn1SccGet_Data_Response *response) {
          response->object, response->subobject);
 
   switch (response->data_value.kind) {
-  case CANopen_Value_boolean_d_PRESENT:
-    printf("0x%s\n", response->data_value.u.boolean_d ? "true" : "false");
+  case CANopen_Value_boolean8_PRESENT:
+    printf("0x%s\n", response->data_value.u.boolean8 ? "true" : "false");
     break;
   case CANopen_Value_unsigned8_PRESENT:
     printf("0x%02lX\n", response->data_value.u.unsigned8);

@@ -27,4 +27,4 @@ map_nmt_ec_reason_to_asn(co_nmt_ec_reason_t reason);
 
 const char *map_nmt_ec_reason_to_string(co_nmt_ec_reason_t reason);
 
-co_unsigned8_t map_asn_nmt_state_to_command(asn1SccCANopen_NMT_State);
+co_unsigned8_t map_asn_nmt_state_to_command(asn1SccCANopen_NMT_State state);

@@ -329,8 +329,8 @@ void canopen_PI_set_object_dictionary_data(
   // Write value based on the choice type
   size_t bytes_written = 0;
   switch (value->kind) {
-  case CANopen_Value_boolean_d_PRESENT:
-    bytes_written = co_sub_set_val_b(sub, value->u.boolean_d);
+  case CANopen_Value_boolean8_PRESENT:
+    bytes_written = co_sub_set_val_b(sub, value->u.boolean8);
     break;
   case CANopen_Value_unsigned8_PRESENT:
     bytes_written = co_sub_set_val_u8(sub, (co_unsigned8_t)value->u.unsigned8);
@@ -404,8 +404,8 @@ void canopen_PI_get_object_dictionary_data(
 
   switch (type) {
   case CO_DEFTYPE_BOOLEAN:
-    value->kind = CANopen_Value_boolean_d_PRESENT;
-    value->u.boolean_d = (co_sub_get_val_b(sub));
+    value->kind = CANopen_Value_boolean8_PRESENT;
+    value->u.boolean8 = (co_sub_get_val_b(sub));
     break;
   case CO_DEFTYPE_UNSIGNED8:
     value->kind = CANopen_Value_unsigned8_PRESENT;

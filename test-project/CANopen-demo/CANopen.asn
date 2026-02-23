@@ -32,7 +32,7 @@ CANopen-Object-Index ::= INTEGER(0..65535)
 CANopen-Subobject-Index ::= INTEGER(0..255)
 
 CANopen-Value ::= CHOICE {
-   boolean-d CANopen-Boolean,
+   boolean8 CANopen-Boolean,
    unsigned8 CANopen-Unsigned8,
    unsigned16 CANopen-Unsigned16,
    unsigned24 CANopen-Unsigned24,
