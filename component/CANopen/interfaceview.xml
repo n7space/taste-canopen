@@ -1,72 +1,76 @@
 <InterfaceView version="1.2" componentURL="/home/taste/.local/share/QtProject/QtCreator/components_library/.git_bares/CANopen_bare">
-<Function id="{19209218-ac64-4ba3-9e4a-61af25a3c66c}" name="CANopen" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_max="1" instances_min="1" startup_priority="1">
+<Function id="{56571c38-a70f-424e-9c50-e057abc1f4b7}" name="CANopen" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" instances_min="1" instances_max="1" startup_priority="1">
     <Property name="TASTE_IV_Properties::Default_Codegen" value="C"/>
-<Provided_Interface id="{51c5edb0-d29d-4668-b071-faa1f4661c80}" name="init" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+<Provided_Interface id="{8f8ba6be-a648-41f8-be81-7ee2808d774b}" name="init" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+    <Output_Parameter name="result" type="CANopen-Init-Result" encoding="NATIVE"/>
 </Provided_Interface>
 
-<Provided_Interface id="{3258bda0-7383-49a9-abeb-931b3b4fdc37}" name="change_node_state" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+<Provided_Interface id="{a048d0fb-2797-4ac9-85b7-412a712908ea}" name="change_node_state" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
     <Input_Parameter name="newstate" type="CANopen-NMT-State" encoding="NATIVE"/>
 </Provided_Interface>
 
-<Provided_Interface id="{38a84fb9-9290-4cae-afff-c3114e7bd673}" name="reset_node" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+<Provided_Interface id="{829edda1-8f35-4f9c-9bfb-9ac7704b9cc8}" name="reset_node" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
 </Provided_Interface>
 
-<Provided_Interface id="{c09ed841-5bef-4623-bcdb-743c66b96116}" name="get_object_dictionary_data" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+<Provided_Interface id="{94acc04e-458a-46ac-bdd6-cd203390894b}" name="get_object_dictionary_data" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
     <Input_Parameter name="index" type="CANopen-Object-Index" encoding="NATIVE"/>
     <Input_Parameter name="subindex" type="CANopen-Subobject-Index" encoding="NATIVE"/>
     <Output_Parameter name="value" type="CANopen-Value" encoding="NATIVE"/>
+    <Output_Parameter name="result" type="CANopen-ObjDict-Operation-Result" encoding="NATIVE"/>
 </Provided_Interface>
 
-<Provided_Interface id="{6625857e-49e8-4bb2-8fb6-b7c0120bb03a}" name="set_object_dictionary_data" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+<Provided_Interface id="{12355a72-5036-4450-b221-7259203a4e49}" name="set_object_dictionary_data" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
     <Input_Parameter name="index" type="CANopen-Object-Index" encoding="NATIVE"/>
     <Input_Parameter name="subindex" type="CANopen-Subobject-Index" encoding="NATIVE"/>
     <Input_Parameter name="value" type="CANopen-Value" encoding="NATIVE"/>
+    <Output_Parameter name="result" type="CANopen-ObjDict-Operation-Result" encoding="NATIVE"/>
 </Provided_Interface>
 
-<Provided_Interface id="{a98bce94-456a-4370-b89a-b1f2af2bae1c}" name="canopen_network_tick" kind="Cyclic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" stack_size="1024" dispatch_offset="0" wcet="0" period="10" priority="1">
+<Provided_Interface id="{88b00696-f2e4-4a9d-9e71-25a85d493c64}" name="canopen_network_tick" kind="Cyclic" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" dispatch_offset="0" period="10" stack_size="1024" wcet="0" priority="1">
 </Provided_Interface>
 
-<Provided_Interface id="{587706a2-1045-4741-89f1-fd644d5cc0bf}" name="receive_data" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+<Provided_Interface id="{c8fef90f-48f2-4ea8-bb0b-aaea135ae18b}" name="receive_data" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
     <Input_Parameter name="frame" type="Can-Frame" encoding="NATIVE"/>
 </Provided_Interface>
 
-<Provided_Interface id="{c3a11547-49b1-4110-9390-cf28d6313d47}" name="issue_slave_command" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+<Provided_Interface id="{62bfadbc-85d6-47ee-9923-f3255d711f07}" name="issue_slave_command" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
     <Input_Parameter name="nodeid" type="CANopen-NodeID" encoding="NATIVE"/>
     <Input_Parameter name="cmd" type="CANopen-NMT-Command" encoding="NATIVE"/>
+    <Output_Parameter name="success" type="T-Boolean" encoding="NATIVE"/>
 </Provided_Interface>
 
-<Required_Interface id="{e9a9e37d-673a-4cc7-9302-7692043bc0fe}" name="get_elapsed_time" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" is_observable="false" is_alarm="false">
+<Required_Interface id="{3455d0db-e2f5-41ae-8b93-1b0c29642f6c}" name="get_elapsed_time" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" is_alarm="false" is_observable="false">
     <Output_Parameter name="time" type="Time" encoding="NATIVE"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
-<Required_Interface id="{87e34f78-c5e9-4679-91a6-e029c75d9543}" name="transmit_data" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
+<Required_Interface id="{fe8e3bcd-4d3f-495f-8506-8d3c949c288e}" name="transmit_data" kind="Protected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0">
     <Input_Parameter name="frame" type="Can-Frame" encoding="NATIVE"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
-<Required_Interface id="{9caeae43-0eb5-4fb3-b792-aae31c3378fe}" name="nmt_command_indicator" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" is_observable="false" is_alarm="false">
+<Required_Interface id="{e480d825-26c6-4244-8bc6-5f6958c4bfd8}" name="nmt_command_indicator" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" is_alarm="false" is_observable="false">
     <Input_Parameter name="command" type="CANopen-NMT-Command" encoding="NATIVE"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
-<Required_Interface id="{70b25dd6-b026-41e7-9020-f0375c1c210f}" name="nmt_state_indicator" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" is_observable="false" is_alarm="false">
+<Required_Interface id="{f692cfd5-d2fc-40ba-b703-39aeaf79dfa7}" name="nmt_state_indicator" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" is_alarm="false" is_observable="false">
     <Input_Parameter name="nodeid" type="CANopen-Unsigned8" encoding="NATIVE"/>
     <Input_Parameter name="nodestate" type="CANopen-NMT-State" encoding="NATIVE"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
-<Required_Interface id="{5503c3c3-2aa6-4dcf-8818-cffb963711d4}" name="nmt_sync_indicator" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" is_observable="false" is_alarm="false">
+<Required_Interface id="{f6b67980-2f83-4b77-9cba-e70d88a56eae}" name="nmt_sync_indicator" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" is_alarm="false" is_observable="false">
     <Input_Parameter name="counter" type="CANopen-Unsigned8" encoding="NATIVE"/>
     <Property name="Taste::InheritPI" value="true"/>
     <Property name="Taste::Autonamed" value="false"/>
 </Required_Interface>
 
-<Required_Interface id="{bc9ffdfd-a49d-4689-a58d-6d613ccefa53}" name="nmt_heartbeat_indicator" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" is_observable="false" is_alarm="false">
+<Required_Interface id="{7fbccd8b-75ab-4c49-9f90-f5d24e22d160}" name="nmt_heartbeat_indicator" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" is_simulink_interface="false" wcet="0" is_alarm="false" is_observable="false">
     <Input_Parameter name="nodeid" type="CANopen-NodeID" encoding="NATIVE"/>
     <Input_Parameter name="hbstate" type="CANopen-NMT-HeartbeatState" encoding="NATIVE"/>
     <Input_Parameter name="hbreason" type="CANopen-NMT-HeartbeatReason" encoding="NATIVE"/>
@@ -78,35 +82,35 @@
         <Implementation name="default" language="C"/>
     </Implementations>
 </Function>
-<UI version="1.0" ><Entity id="{19209218-ac64-4ba3-9e4a-61af25a3c66c}"><Taste coordinates="-24000 -8000 -6000 22000">
+<UI version="1.0" ><Entity id="{56571c38-a70f-424e-9c50-e057abc1f4b7}"><Taste coordinates="-24000 -8000 -6000 22000">
 </Taste>
-</Entity><Entity id="{51c5edb0-d29d-4668-b071-faa1f4661c80}"><Taste coordinates="-24000 -5000">
+</Entity><Entity id="{8f8ba6be-a648-41f8-be81-7ee2808d774b}"><Taste coordinates="-24000 -5000">
 </Taste>
-</Entity><Entity id="{3258bda0-7383-49a9-abeb-931b3b4fdc37}"><Taste coordinates="-24000 3000">
+</Entity><Entity id="{a048d0fb-2797-4ac9-85b7-412a712908ea}"><Taste coordinates="-24000 3000">
 </Taste>
-</Entity><Entity id="{38a84fb9-9290-4cae-afff-c3114e7bd673}"><Taste coordinates="-24000 -1000">
+</Entity><Entity id="{829edda1-8f35-4f9c-9bfb-9ac7704b9cc8}"><Taste coordinates="-24000 -1000">
 </Taste>
-</Entity><Entity id="{c09ed841-5bef-4623-bcdb-743c66b96116}"><Taste coordinates="-24000 11000">
+</Entity><Entity id="{94acc04e-458a-46ac-bdd6-cd203390894b}"><Taste coordinates="-24000 11000">
 </Taste>
-</Entity><Entity id="{6625857e-49e8-4bb2-8fb6-b7c0120bb03a}"><Taste coordinates="-24000 15000">
+</Entity><Entity id="{12355a72-5036-4450-b221-7259203a4e49}"><Taste coordinates="-24000 15000">
 </Taste>
-</Entity><Entity id="{a98bce94-456a-4370-b89a-b1f2af2bae1c}"><Taste coordinates="-22000 -8000">
+</Entity><Entity id="{88b00696-f2e4-4a9d-9e71-25a85d493c64}"><Taste coordinates="-22000 -8000">
 </Taste>
-</Entity><Entity id="{587706a2-1045-4741-89f1-fd644d5cc0bf}"><Taste coordinates="-6000 1000">
+</Entity><Entity id="{c8fef90f-48f2-4ea8-bb0b-aaea135ae18b}"><Taste coordinates="-6000 1000">
 </Taste>
-</Entity><Entity id="{c3a11547-49b1-4110-9390-cf28d6313d47}"><Taste coordinates="-24000 7000">
+</Entity><Entity id="{62bfadbc-85d6-47ee-9923-f3255d711f07}"><Taste coordinates="-24000 7000">
 </Taste>
-</Entity><Entity id="{e9a9e37d-673a-4cc7-9302-7692043bc0fe}"><Taste coordinates="-20000 22000">
+</Entity><Entity id="{3455d0db-e2f5-41ae-8b93-1b0c29642f6c}"><Taste coordinates="-20000 22000">
 </Taste>
-</Entity><Entity id="{87e34f78-c5e9-4679-91a6-e029c75d9543}"><Taste coordinates="-6000 -3000">
+</Entity><Entity id="{fe8e3bcd-4d3f-495f-8506-8d3c949c288e}"><Taste coordinates="-6000 -3000">
 </Taste>
-</Entity><Entity id="{9caeae43-0eb5-4fb3-b792-aae31c3378fe}"><Taste coordinates="-6000 8000">
+</Entity><Entity id="{e480d825-26c6-4244-8bc6-5f6958c4bfd8}"><Taste coordinates="-6000 8000">
 </Taste>
-</Entity><Entity id="{70b25dd6-b026-41e7-9020-f0375c1c210f}"><Taste coordinates="-6000 11000">
+</Entity><Entity id="{f692cfd5-d2fc-40ba-b703-39aeaf79dfa7}"><Taste coordinates="-6000 11000">
 </Taste>
-</Entity><Entity id="{5503c3c3-2aa6-4dcf-8818-cffb963711d4}"><Taste coordinates="-6000 14000">
+</Entity><Entity id="{f6b67980-2f83-4b77-9cba-e70d88a56eae}"><Taste coordinates="-6000 14000">
 </Taste>
-</Entity><Entity id="{bc9ffdfd-a49d-4689-a58d-6d613ccefa53}"><Taste coordinates="-6000 17000">
+</Entity><Entity id="{7fbccd8b-75ab-4c49-9f90-f5d24e22d160}"><Taste coordinates="-6000 17000">
 </Taste>
 </Entity>
 </UI>
