@@ -191,14 +191,13 @@ static void nmt_sync_indicator(co_sync_t *sync_in, co_unsigned8_t cnt,
   canopen_RI_nmt_sync_indicator(&asnCounter);
 }
 
-void canopen_startup(void) {
-  // Startup left empty, initialization implemented in canopen_PI_init
-}
+void canopen_startup(void) {}
 
-void canopen_PI_init(void) {
+void canopen_PI_init(asn1SccCANopen_Init_Result *result) {
   if (net != NULL) {
     // Already initialized
     DEBUG_PRINT("[CANopen] Already initialized, ignoring init...\n");
+    *result = asn1SccCANopen_Init_Result_already_initialized;
     return;
   }
 
@@ -208,6 +207,7 @@ void canopen_PI_init(void) {
   dev = master_dev_init();
   if (dev == NULL) {
     DEBUG_PRINT("[CANopen] ERROR: Failed to initialize device\n");
+    *result = asn1SccCANopen_Init_Result_device_creation_failure;
     return;
   }
 
@@ -216,6 +216,7 @@ void canopen_PI_init(void) {
   if (net == NULL) {
     DEBUG_PRINT("[CANopen] ERROR: Failed to create CAN network, check memory "
                 "pool size!\n");
+    *result = asn1SccCANopen_Init_Result_network_creation_failure;
     return;
   }
 
@@ -224,6 +225,7 @@ void canopen_PI_init(void) {
   if (nmt == NULL) {
     DEBUG_PRINT("[CANopen] ERROR: Failed to create NMT service, check memory "
                 "pool size!\n");
+    *result = asn1SccCANopen_Init_Result_nmt_creation_failure;
     return;
   }
 
@@ -231,6 +233,7 @@ void canopen_PI_init(void) {
   if (sync == NULL) {
     DEBUG_PRINT("[CANopen] ERROR: NMT service manager failed to create SYNC "
                 "service, check memory pool size!\n");
+    *result = asn1SccCANopen_Init_Result_sync_creation_failure;
     return;
   }
 
@@ -244,6 +247,7 @@ void canopen_PI_init(void) {
   startupTime = get_current_time();
 
   DEBUG_PRINT("[CANopen] Initialization complete\n");
+  *result = asn1SccCANopen_Init_Result_success;
 }
 
 void canopen_PI_canopen_network_tick(void) {
@@ -254,13 +258,13 @@ void canopen_PI_canopen_network_tick(void) {
   struct timespec currentTime = get_time_from_startup();
   can_net_set_time(net, &currentTime);
 
-  // TODO: this is debug log, probably kill
+#ifdef CANOPEN_DEBUG
   static uint32_t counter = 0;
   if (counter % 100 == 0)
     DEBUG_PRINT("[CANopen] Current network time: %lds, %ldns\n",
                 currentTime.tv_sec, currentTime.tv_nsec);
-
   counter++;
+#endif
 }
 
 void canopen_PI_change_node_state(const asn1SccCANopen_NMT_State *state) {
@@ -303,7 +307,8 @@ void canopen_PI_issue_slave_command(
               map_nmt_command_to_string(command), nodeId);
 
   if (co_nmt_cs_req(nmt, command, nodeId) != 0) {
-    DEBUG_PRINT("[CANopen] NMT command request %X (%s) to node %X failed!\n",
+    DEBUG_PRINT("[CANopen] NMT command request %X (%s) to node %X failed (is "
+                "target node on the network?)!\n",
                 command, map_nmt_command_to_string(command), nodeId);
   }
 }
@@ -311,14 +316,17 @@ void canopen_PI_issue_slave_command(
 void canopen_PI_set_object_dictionary_data(
     const asn1SccCANopen_Object_Index *index,
     const asn1SccCANopen_Subobject_Index *subindex,
-    const asn1SccCANopen_Value *value) {
-  if (dev == NULL || index == NULL || subindex == NULL || value == NULL) {
+    const asn1SccCANopen_Value *value,
+    asn1SccCANopen_ObjDict_Operation_Result *result) {
+  if (dev == NULL) {
+    *result = asn1SccCANopen_ObjDict_Operation_Result_device_not_initialized;
     return;
   }
 
   co_obj_t *obj = co_dev_find_obj(dev, (co_unsigned16_t)(*index));
   if (obj == NULL) {
     DEBUG_PRINT("[CANopen] ERROR: Object %04lX not found\n", *index);
+    *result = asn1SccCANopen_ObjDict_Operation_Result_invalid_index;
     return;
   }
 
@@ -326,6 +334,7 @@ void canopen_PI_set_object_dictionary_data(
   if (sub == NULL) {
     DEBUG_PRINT("[CANopen] ERROR: Sub-object %04lX:%02lX not found\n", *index,
                 *subindex);
+    *result = asn1SccCANopen_ObjDict_Operation_Result_invalid_subindex;
     return;
   }
 
@@ -368,30 +377,37 @@ void canopen_PI_set_object_dictionary_data(
   default:
     DEBUG_PRINT("[CANopen] ERROR: Unsupported value type 0x%04X\n",
                 value->kind);
+    *result = asn1SccCANopen_ObjDict_Operation_Result_unsupported_type;
     return;
   }
 
   if (bytes_written == 0) {
     DEBUG_PRINT("[CANopen] ERROR: Failed to write value to OD %04lX:%02lX\n",
                 *index, *subindex);
+    *result = asn1SccCANopen_ObjDict_Operation_Result_write_failed;
     return;
   }
 
   DEBUG_PRINT("[CANopen] Set OD %04lX:%02lX successful (%zu bytes written)\n",
               *index, *subindex, bytes_written);
+  *result = asn1SccCANopen_ObjDict_Operation_Result_success;
 }
 
 void canopen_PI_get_object_dictionary_data(
     const asn1SccCANopen_Object_Index *index,
-    const asn1SccCANopen_Subobject_Index *subindex,
-    asn1SccCANopen_Value *value) {
-  if (dev == NULL || index == NULL || subindex == NULL || value == NULL) {
+    const asn1SccCANopen_Subobject_Index *subindex, asn1SccCANopen_Value *value,
+    asn1SccCANopen_ObjDict_Operation_Result *result) {
+  if (dev == NULL) {
+    DEBUG_PRINT("[CANopen] ERROR: cannot get object dictionary value, device "
+                "not initialized\n");
+    *result = asn1SccCANopen_ObjDict_Operation_Result_device_not_initialized;
     return;
   }
 
   co_obj_t *obj = co_dev_find_obj(dev, (co_unsigned16_t)(*index));
   if (obj == NULL) {
     DEBUG_PRINT("[CANopen] ERROR: Object %04lX not found\n", *index);
+    *result = asn1SccCANopen_ObjDict_Operation_Result_invalid_index;
     return;
   }
 
@@ -399,6 +415,7 @@ void canopen_PI_get_object_dictionary_data(
   if (sub == NULL) {
     DEBUG_PRINT("[CANopen] ERROR: Sub-object %04lX:%02lX not found\n", *index,
                 *subindex);
+    *result = asn1SccCANopen_ObjDict_Operation_Result_invalid_subindex;
     return;
   }
 
@@ -447,9 +464,11 @@ void canopen_PI_get_object_dictionary_data(
     value->u.real32 = co_sub_get_val_r32(sub);
     break;
   default:
+    *result = asn1SccCANopen_ObjDict_Operation_Result_unsupported_type;
     DEBUG_PRINT("[CANopen] ERROR: Unsupported value type 0x%04X\n", type);
     break;
   }
 
   DEBUG_PRINT("[CANopen] Get OD %04lX:%02lX successful\n", *index, *subindex);
+  *result = asn1SccCANopen_ObjDict_Operation_Result_success;
 }

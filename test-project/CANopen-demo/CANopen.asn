@@ -103,6 +103,7 @@ Node-Command-Request ::= SEQUENCE {
 CANopen-Init-Result ::= ENUMERATED {
    success,
    already-initialized,
+   device-creation-failure,
    network-creation-failure,
    nmt-creation-failure,
    sync-creation-failure
@@ -110,6 +111,7 @@ CANopen-Init-Result ::= ENUMERATED {
 
 CANopen-ObjDict-Operation-Result ::= ENUMERATED {
    success,
+   device-not-initialized,
    invalid-index,
    invalid-subindex,
    unsupported-type,
