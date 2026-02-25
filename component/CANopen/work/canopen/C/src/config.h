@@ -25,7 +25,7 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
-#ifdef CANOPEN_LINUX
+#ifdef __linux__
 /* Define to 1 if you have the <linux/can/error.h> header file. */
 #define HAVE_LINUX_CAN_ERROR_H 1
 
@@ -50,11 +50,6 @@
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
-
-#ifdef CANOPEN_STDIO
-/* Define to 1 if you have the <stdio.h> header file. */
-#define HAVE_STDIO_H 1
-#endif
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -86,7 +81,7 @@
 /* Define to 1 if you have the IXXAT VCI SDK. */
 /* #undef LELY_HAVE_IXXAT */
 
-#ifdef CANOPEN_LINUX
+#ifdef __linux__
 /* Define to 1 if you have SocketCAN. */
 #define LELY_HAVE_SOCKET_CAN 1
 #endif
