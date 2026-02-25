@@ -60,6 +60,8 @@ canopen-demo: debug
 	@-pkill demo
 	@-pkill candump
 
+test: canopen-demo
+
 # To build and run the system type e.g. 'make debug run'
 run:
 	$(MAKE) -C work run
