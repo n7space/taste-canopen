@@ -1,0 +1,133 @@
+CANOPEN-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+Can-Standard-Id ::= INTEGER (0 .. 2047)
+Can-Extended-Id ::= INTEGER (0 .. 536870911)
+
+Can-Id ::= CHOICE {
+  standard-id Can-Standard-Id,
+  extended-id Can-Extended-Id
+}
+
+Can-Frame ::= SEQUENCE {
+  id Can-Id,
+  data OCTET STRING (SIZE(0..8))
+}
+
+Raw-Can-Frame ::= OCTET STRING (SIZE(4..12))
+
+CANopen-Boolean ::= BOOLEAN
+CANopen-Unsigned8 ::= INTEGER(0..255)
+CANopen-Unsigned16 ::= INTEGER(0..65535)
+CANopen-Unsigned24 ::= INTEGER(0..16777215)
+CANopen-Unsigned32 ::= INTEGER(0..4294967295)
+CANopen-Signed8 ::= INTEGER(-128..127)
+CANopen-Signed16 ::= INTEGER(-32768..32767)
+CANopen-Signed24 ::= INTEGER(-8388608..8388607)
+CANopen-Signed32 ::= INTEGER(-2147483648..2147483647)
+CANopen-Real32 ::= REAL(-1000..1000)
+
+CANopen-NodeID ::= INTEGER(0..127)
+CANopen-Object-Index ::= INTEGER(0..65535)
+CANopen-Subobject-Index ::= INTEGER(0..255)
+
+CANopen-Value ::= CHOICE {
+   boolean8 CANopen-Boolean,
+   unsigned8 CANopen-Unsigned8,
+   unsigned16 CANopen-Unsigned16,
+   unsigned24 CANopen-Unsigned24,
+   unsigned32 CANopen-Unsigned32,
+   signed8 CANopen-Signed8,
+   signed16 CANopen-Signed16,
+   signed24 CANopen-Signed24,
+   signed32 CANopen-Signed32,
+   real32 CANopen-Real32
+}
+
+CANopen-NMT-Command ::= ENUMERATED {
+   start,
+   stop,
+   enter-preop,
+   reset-node,
+   reset-comm
+}
+
+CANopen-NMT-State ::= ENUMERATED {
+   bootup,
+   stop,
+   start,
+   reset-node,
+   reset-comm,
+   preop
+}
+
+CANopen-NMT-HeartbeatState ::= ENUMERATED {
+   occurred,
+   resolved
+}
+
+CANopen-NMT-HeartbeatReason ::= ENUMERATED {
+   timeout,
+   state-change
+}
+
+Time ::= SEQUENCE {
+   seconds INTEGER(0..4294967295),
+   nanoseconds INTEGER(0..999999999)
+}
+
+-- Helper types
+
+CANopen-Init-Result ::= ENUMERATED {
+   success,
+   already-initialized,
+   device-creation-failure,
+   network-creation-failure,
+   nmt-creation-failure,
+   sync-creation-failure
+}
+
+CANopen-ObjDict-Operation-Result ::= ENUMERATED {
+   success,
+   device-not-initialized,
+   invalid-index,
+   invalid-subindex,
+   unsupported-type,
+   write-failed
+}
+
+CANopen-Slave-Command ::= SEQUENCE {
+   node-id CANopen-NodeID,
+   command CANopen-NMT-Command
+}
+
+CANopen-Slave-Command-Result ::= SEQUENCE {
+   node-id CANopen-NodeID,
+   command CANopen-NMT-Command,
+   success BOOLEAN
+}
+
+Get-Data-Request ::= SEQUENCE {
+   object CANopen-Object-Index,
+   subobject CANopen-Subobject-Index
+}
+
+Get-Data-Response ::= SEQUENCE {
+   object CANopen-Object-Index,
+   subobject CANopen-Subobject-Index,
+   data-value CANopen-Value,
+   result CANopen-ObjDict-Operation-Result
+}
+
+Set-Data-Request ::= SEQUENCE {
+   object CANopen-Object-Index,
+   subobject CANopen-Subobject-Index,
+   data-value CANopen-Value
+}
+
+Node-Command-Request ::= SEQUENCE {
+   node-id CANopen-NodeID,
+   command CANopen-NMT-Command
+}
+
+END
