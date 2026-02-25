@@ -137,9 +137,9 @@ void canopen_PI_receive_data(const asn1SccCan_Frame *frame_data) {
 }
 
 static void nmt_command_indicator(co_nmt_t *nmt_in, co_unsigned8_t cs,
-                                  void *data) {
+                                  void *userdata) {
   assert(nmt_in == nmt);
-  (void)data;
+  (void)userdata;
 
   DEBUG_PRINT(
       "[CANopen] NMT command indicator triggered; received command: %X (%s) \n",
@@ -150,9 +150,9 @@ static void nmt_command_indicator(co_nmt_t *nmt_in, co_unsigned8_t cs,
 }
 
 static void nmt_state_indicator(co_nmt_t *nmt_in, co_unsigned8_t id,
-                                co_unsigned8_t st, void *data) {
+                                co_unsigned8_t st, void *userdata) {
   assert(nmt_in == nmt);
-  (void)data;
+  (void)userdata;
   DEBUG_PRINT(
       "[CANopen] NMT state indicator triggered; ID: %X, state: %X (%s)\n", id,
       st, map_nmt_state_to_string(st));
@@ -163,10 +163,10 @@ static void nmt_state_indicator(co_nmt_t *nmt_in, co_unsigned8_t id,
 }
 
 static void nmt_hearbeat_indicator(co_nmt_t *nmt_in, co_unsigned8_t id,
-                                   co_nmt_ec_state_t state_,
-                                   co_nmt_ec_reason_t reason, void *data) {
+                                   co_nmt_ec_state_t state_in,
+                                   co_nmt_ec_reason_t reason, void *userdata) {
   assert(nmt_in == nmt);
-  (void)data;
+  (void)userdata;
   DEBUG_PRINT(
       "[CANopen] NMT heartbeat received from node %02X, state: %X (%s), "
       "reason: %X (%s)\n",
@@ -175,16 +175,16 @@ static void nmt_hearbeat_indicator(co_nmt_t *nmt_in, co_unsigned8_t id,
 
   const asn1SccCANopen_NodeID asnNodeId = id;
   const asn1SccCANopen_NMT_HeartbeatState asnHbState =
-      map_nmt_ec_state_to_asn(state_);
+      map_nmt_ec_state_to_asn(state_in);
   const asn1SccCANopen_NMT_HeartbeatReason asnHbReason =
       map_nmt_ec_reason_to_asn(reason);
   canopen_RI_nmt_heartbeat_indicator(&asnNodeId, &asnHbState, &asnHbReason);
 }
 
 static void nmt_sync_indicator(co_sync_t *sync_in, co_unsigned8_t cnt,
-                               void *data) {
+                               void *userdata) {
   assert(sync_in == sync);
-  (void)data;
+  (void)userdata;
   DEBUG_PRINT("[CANopen] NMT sync received, counter: %X\n", cnt);
 
   const asn1SccCANopen_Unsigned8 asnCounter = cnt;
